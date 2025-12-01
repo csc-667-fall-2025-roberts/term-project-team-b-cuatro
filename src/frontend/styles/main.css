@@ -173,7 +173,7 @@ button:not(form button) {
 }
 
 /* -------------------------------
-   Chat Styles
+   Chat Styles (shared)
 -------------------------------- */
 .chat-box,
 .chat-card {
@@ -191,6 +191,16 @@ button:not(form button) {
     margin-bottom: 0.5rem;
 }
 
+/* scrollable message area used in lobby & game */
+.chat-messages {
+    background: #f7f7f7;
+    border-radius: 8px;
+    padding: 0.75rem;
+    overflow-y: auto;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
 .chat-input {
     display: flex;
     gap: 0.5rem;
@@ -201,7 +211,7 @@ button:not(form button) {
 }
 
 /* -------------------------------
-   Game Page Mockup
+   Game Page Mockup (basic)
 -------------------------------- */
 .game-area {
     margin-top: 1rem;
@@ -289,9 +299,9 @@ button:not(form button) {
     border: 2px solid #333;
 }
 
-.uno-card.red { background-color: #d93f3f; }
-.uno-card.green { background-color: #3cb371; }
-.uno-card.blue { background-color: #1e90ff; }
+.uno-card.red    { background-color: #d93f3f; }
+.uno-card.green  { background-color: #3cb371; }
+.uno-card.blue   { background-color: #1e90ff; }
 .uno-card.yellow { background-color: #ffd700; color: black; }
 
 /* Wild cards */
@@ -329,7 +339,7 @@ button:not(form button) {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* only center, no rotate */
+    transform: translate(-50%, -50%);
     width: 70px;
     height: 90px;
     background-color: rgba(255,255,255,0.2);
@@ -344,42 +354,13 @@ button:not(form button) {
 
 /* Wrap the icon inside a rotated oval container */
 .card-center .icon {
-    transform: none; /* negate the oval rotation if applied */
+    transform: none;
 }
-
-/* -------------------------------
-   Action Card Symbols
-
-.uno-card.skip .card-center::after {
-    content: "⏭";
-    font-size: 2rem;
-}
-
-.uno-card.reverse .card-center::after {
-    content: "🔄";
-    font-size: 2rem;
-}
-
-.uno-card.draw2 .card-center::after {
-    content: "+2";
-    font-size: 2rem;
-}
-
-.uno-card.wild.draw4 .card-center::after {
-    content: "+4";
-    font-size: 2rem;
-}
--------------------------------- */
 
 /* -------------------------------
    Game Layout Specific Styles
+   (non-grid helpers: center piles, etc.)
 -------------------------------- */
-.game-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 1rem;
-}
 
 .board-center {
     display: flex;
@@ -406,4 +387,189 @@ button:not(form button) {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
+}
+
+/* =========================================================
+   GAME PAGE LAYOUT -- Danny update
+   ========================================================= */
+
+.game-layout {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+        "info   info"
+        "board  chat"
+        "hand   chat";
+    gap: 1.5rem;
+    align-items: flex-start;
+    margin: 1.5rem auto;
+    max-width: 1200px;
+}
+
+.game-info {
+    grid-area: info;
+}
+
+.game-board {
+    grid-area: board;
+}
+
+.player-hand {
+    grid-area: hand;
+}
+
+/* ---- GAME CHAT: tall right column, large messages, stacked input+button ---- */
+
+.game-chat {
+    grid-area: chat;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    background: var(--bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    min-height: 720px;  /* tall chat column like before */
+}
+
+.game-chat h2 {
+    margin: 0 0 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* big scrollable message area inside game chat */
+.game-chat .chat-messages {
+    flex: 1;
+    min-height: 0;
+    background: #f7f7f7;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+/* Make chat input and send button full-width stacked */
+.game-chat .chat-input {
+    display: flex;
+    flex-direction: column;   /* input ABOVE button */
+    gap: 0.1rem;
+    width: 100%;
+}
+
+.game-chat .chat-input input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+.game-chat .chat-input button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.game-chat .chat-input button:hover {
+    background: var(--primary-dark);
+}
+
+/* -------------------------------
+   Inner table layout: players around center
+-------------------------------- */
+
+.game-table-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+        ".     top    ."
+        "left  center right"
+        ".     .      .";
+    min-height: 260px;
+    align-items: center;
+    justify-items: center;
+}
+
+/* slightly bigger player boxes, less empty space */
+.player-slot {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 0.9rem 1.4rem;      /* bigger than before */
+    min-width: 120px;            /* makes the card wider */
+    text-align: center;
+    font-size: 0.95rem;          /* slightly larger text */
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+}
+
+.player-top   { grid-area: top; }
+.player-left  { grid-area: left; }
+.player-right { grid-area: right; }
+
+.player-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.player-meta {
+    color: #6b7280;
+    font-size: 0.78rem;
+}
+
+/* Center piles -------------------------------------------------------- */
+
+.table-center {
+    grid-area: center;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.pile-label {
+    text-align: center;
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+    color: #4b5563;
+}
+
+.pile-cards {
+    width: 80px;
+    height: 120px;
+    border-radius: 12px;
+    background: #e5edff;
+    border: 2px solid #3b82f6;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Player hand row ----------------------------------------------------- */
+
+.player-hand .hand-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* Responsive layout --------------------------------------------------- */
+
+@media (max-width: 900px) {
+    .game-layout {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "info"
+            "board"
+            "hand"
+            "chat";
+    }
 }
