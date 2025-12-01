@@ -1,0 +1,39 @@
+{
+  "name": "term-project-team-b-cuatro",
+  "version": "1.0.0",
+  "description": "- Jasmine Hernandez\r - Sarah Sahajlan\r - Daniel Perez Paiz\r - Katy O'Brien",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/backend/server.ts",
+    "build": "tsc",
+    "start": "node dist/backend/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/csc-667-fall-2025-roberts/term-project-team-b-cuatro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/csc-667-fall-2025-roberts/term-project-team-b-cuatro/issues"
+  },
+  "homepage": "https://github.com/csc-667-fall-2025-roberts/term-project-team-b-cuatro#readme",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "http-errors": "^2.0.1",
+    "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/http-errors": "^2.0.5",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.10.1",
+    "nodemon": "^3.1.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
