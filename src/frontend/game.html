@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game – UNO</title>
+    <link rel="stylesheet" href="./styles/main.css" />
+</head>
+<body>
+    <header class="site-header">
+        <h1>UNO Game</h1>
+        <nav>
+            <a href="/lobby">Back to Lobby</a>
+        </nav>
+    </header>
+
+    <main class="game-layout">
+        <!-- Game Info Bar -->
+        <section class="game-info card">
+            <h2>Game: {{game_name}}</h2>
+            <p>Players: {{player_count}} / {{max_players}}</p>
+            <p>Turn: {{current_player}}</p>
+        </section>
+
+        <!-- Gameplay Board -->
+        <section class="game-board card">
+            <h2>Game Board</h2>
+            <div class="board-center">
+                <div class="discard-pile" id="discard-pile"></div>
+                <div class="draw-pile" id="draw-pile"></div>
+            </div>
+        </section>
+
+        <!-- Player Hand -->
+        <section class="player-hand card">
+            <h2>Your Cards</h2>
+            <div class="hand-cards" id="player-hand">
+                <!-- Uno cards will be generated here dynamically -->
+            </div>
+        </section>
+
+        <!-- Chat -->
+        <section class="game-chat card">
+            <h2>Game Chat</h2>
+            <div class="chat-messages">{{messages}}</div>
+            <form action="/messages/send" method="POST" class="chat-input">
+                <input type="text" name="message" placeholder="Type a message..." required />
+                <button type="submit">Send</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Link to external JS -->
+    <script src="./game.js"></script>
+</body>
+</html>

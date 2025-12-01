@@ -1,0 +1,408 @@
+/* =========================================
+   Main CSS for UNO Project - Vanilla CSS
+   ========================================= */
+
+/* -------------------------------
+   CSS Variables
+-------------------------------- */
+:root {
+    --primary: #e63946;
+    --primary-dark: #d62828;
+    --bg: #ffffff;
+    --shadow: 0 4px 12px rgba(0,0,0,0.1);
+    --radius: 8px;
+}
+
+/* -------------------------------
+   Body & Global Styles
+-------------------------------- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* -------------------------------
+   Site Header
+-------------------------------- */
+.site-header {
+    background: var(--primary);
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow);
+}
+
+.site-header a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.site-header a:hover {
+    text-decoration: underline;
+}
+
+/* -------------------------------
+   Form Container & Cards
+-------------------------------- */
+.form-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.form-card {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    max-width: 400px;
+    width: 100%;
+}
+
+.form-card h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.form-card p {
+    text-align: center;
+}
+
+/* -------------------------------
+   Forms & Inputs
+-------------------------------- */
+form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+form input {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid #ccc;
+}
+
+form input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(230,57,70,0.3);
+}
+
+/* Buttons */
+form button {
+    width: 100%; /* Full width for forms only */
+    padding: 0.75rem;
+    background: var(--primary);
+    border: none;
+    color: white;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+}
+
+form button:hover {
+    background: var(--primary-dark);
+}
+
+button:not(form button) {
+    width: auto;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+}
+
+/* -------------------------------
+   Error Messages
+-------------------------------- */
+.error-message {
+    background: #ffd6d6;
+    padding: 0.75rem;
+    border-left: 4px solid #e63946;
+    margin-bottom: 1rem;
+    border-radius: var(--radius);
+}
+
+/* -------------------------------
+   Lobby Styles
+-------------------------------- */
+.lobby-card {
+    max-width: 700px;
+}
+
+.game-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-top: 1rem;
+}
+
+.game-list-item,
+.game-list li {
+    background: var(--bg);
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: var(--radius);
+    display: flex;
+    justify-content: space-between;
+    box-shadow: var(--shadow);
+}
+
+.game-list li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+.game-list li a:hover {
+    color: var(--primary);
+}
+
+/* -------------------------------
+   Chat Styles
+-------------------------------- */
+.chat-box,
+.chat-card {
+    margin-top: 1rem;
+    background: var(--bg);
+    padding: 1rem;
+    border-radius: var(--radius);
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-message {
+    margin-bottom: 0.5rem;
+}
+
+.chat-input {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chat-input input {
+    flex: 1;
+}
+
+/* -------------------------------
+   Game Page Mockup
+-------------------------------- */
+.game-area {
+    margin-top: 1rem;
+    background: var(--bg);
+    padding: 2rem;
+    border-radius: var(--radius);
+    min-height: 300px;
+    box-shadow: var(--shadow);
+}
+
+.placeholder-card {
+    width: 80px;
+    height: 120px;
+    background: #ddd;
+    border-radius: var(--radius);
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+/* -------------------------------
+   Lobby Layout (Columns)
+-------------------------------- */
+.lobby-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding: 2rem;
+    justify-content: center;
+}
+
+.lobby-left,
+.lobby-right {
+    flex: 1;
+    min-width: 300px;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Lobby Cards */
+.card {
+    background: var(--bg);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.card h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+/* -------------------------------
+   Responsive Adjustments
+-------------------------------- */
+@media (max-width: 800px) {
+    .lobby-layout {
+        flex-direction: column;
+        padding: 1rem;
+    }
+}
+
+/* -------------------------------
+   Uno Card Styles
+-------------------------------- */
+.uno-card {
+    width: 90px;
+    height: 140px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 5px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    position: relative;
+    margin: 0.25rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    background-clip: padding-box;
+    border: 2px solid #333;
+}
+
+.uno-card.red { background-color: #d93f3f; }
+.uno-card.green { background-color: #3cb371; }
+.uno-card.blue { background-color: #1e90ff; }
+.uno-card.yellow { background-color: #ffd700; color: black; }
+
+/* Wild cards */
+.uno-card.wild {
+    background: linear-gradient(45deg, red, yellow, green, blue);
+    color: black;
+}
+
+/* Corner numbers/symbols */
+.card-top-left,
+.card-bottom-right {
+    font-size: 0.9rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-top-left {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+}
+
+/* Flip the bottom-right corner */
+.card-bottom-right {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    transform: rotate(180deg);
+}
+
+/* Center Oval */
+.card-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* only center, no rotate */
+    width: 70px;
+    height: 90px;
+    background-color: rgba(255,255,255,0.2);
+    border: 3px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* Wrap the icon inside a rotated oval container */
+.card-center .icon {
+    transform: none; /* negate the oval rotation if applied */
+}
+
+/* -------------------------------
+   Action Card Symbols
+
+.uno-card.skip .card-center::after {
+    content: "⏭";
+    font-size: 2rem;
+}
+
+.uno-card.reverse .card-center::after {
+    content: "🔄";
+    font-size: 2rem;
+}
+
+.uno-card.draw2 .card-center::after {
+    content: "+2";
+    font-size: 2rem;
+}
+
+.uno-card.wild.draw4 .card-center::after {
+    content: "+4";
+    font-size: 2rem;
+}
+-------------------------------- */
+
+/* -------------------------------
+   Game Layout Specific Styles
+-------------------------------- */
+.game-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+.board-center {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.draw-pile,
+.discard-pile {
+    width: 80px;
+    height: 120px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #333;
+    background: #f1f1f1;
+}
+
+.hand-cards {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}

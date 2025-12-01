@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup – UNO</title>
+    <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+    <header class="site-header">
+        <h1>UNO</h1>
+        <nav>
+            <a href="login.html">Login</a>
+        </nav>
+    </header>
+
+    <main class="form-container">
+        <section class="form-card">
+            <h2>Sign Up</h2>
+
+            <!-- Optional error message -->
+            <!-- <div class="error-message">Email already exists</div> -->
+
+            <form action="/auth/signup" method="POST">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Choose a username" required />
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required />
+
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Create a password" required />
+
+                <button type="submit">Create My Account</button>
+            </form>
+
+            <p>
+                Already have an account?
+                <a href="login.html">Log in</a>
+            </p>
+        </section>
+    </main>
+</body>
+</html>

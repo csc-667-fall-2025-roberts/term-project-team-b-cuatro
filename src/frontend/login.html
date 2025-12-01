@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login – UNO</title>
+    <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+    <header class="site-header">
+        <h1>UNO</h1>
+        <nav>
+            <a href="signup.html">Signup</a>
+        </nav>
+    </header>
+
+    <main class="form-container">
+        <section class="form-card">
+            <h2>Login</h2>
+
+            <!-- Optional error message -->
+            <!-- <div class="error-message">Invalid username or password</div> -->
+
+            <form action="/auth/login" method="POST">
+                <label for="username">Username</label>
+                <input type="username" id="username" name="username" placeholder="Enter your username" required />
+
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required />
+
+                <button type="submit">Login</button>
+            </form>
+
+            <p>
+                Don't have an account?
+                <a href="signup.html">Create one</a>
+            </p>
+        </section>
+    </main>
+</body>
+</html>
