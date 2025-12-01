@@ -1,0 +1,41 @@
+body{
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAzFBMVEXCZma4TU3NgICkGhquMzPShITGaWm+UFCoRESoGxuiRETJaWmyW1uAQEB5MzO8cnKrWlq2cnJFFxc+EhJmCQlyJiZKKChkDQ2VFhZDGhqPFhZHIyM5DQ2YLS1NMTE2CgptFhafLCw5AAA+DAydUFCUPDwAAABIGhpXCwseBARoIiJvLS0yDAwTBQWrZWV1OTkpDAx8ExM8GRmZPDzNeHihZWU7FxeXUFBSNDQXEhJGCwtUIiIrBgaKJydbCwtIICBKExNDKSkuFBQjAACfrD/fAAAEF0lEQVR4nO3da1PaQBjF8dRWiqKACReBCN4wBBJBaq14QdHv/52a2k4HZ6rP6Uxsdf2fN52Omd39TZJ9Q3LiHdSaZgbxsG5nEpXtjKShbifCQcN4JEzoe7U1O+2w+NlOq1wqmKkGylD1lnDQerBhz1cqe821j1bW2r3iBzOZsOCZyYTCUJnQPioT2vMVECJEiBAhQoQIESJEiBAhQoQIESJEiBAhQoQIESJEiHBZKPwGnJuwkJ/w4TdgRTho2zlJ+utmimejqp1vylDrw2nRPqifHAoTjrw4tJMcBX5gxU/j5f+Gfz4qOUp6duLUnO7HUE/M8WgBsTfasHMYHFfsLIZFO/2kvW2n2VFWFX4RJhx60s3jV1ZXrKx268r20NsWtrZao5TbLa0IvUxoAnWhCdSE6raM8C+E5wjfuvC04brwHdyHCBEiRIgQIUKECBEiRIgQIUKECBEiRIgQIcIXFpbsbESVVTvndeUl+t628PBHJrRT9aVX+727jpB00TVzPgukIoRmzc7+7PfUjUf/PF7VWcvOxLvctDO+n+/auUiFCadpp2Fntryq8lOrulJaIyJvU7j+toK9T3Z2b4SLpuhvCBdgZ3lVp0+tKtJaIzbtpyxWZKGw00iPanWkVfnaU1+vUVhCiBAhQoQIESJEiBAhQoQIEToiLJ+6LnT/HCJEiBAhQoQI34Gw4bzQ/XP4r4Xqb8C5VT1IwtVMKLVGjLfsfE2ud+wM8qt66EirOtNaIyaRnVaaBOFDC8Mz1RJBHlUPP+On4qqExovYGwt9EMfBodDiMMqv6uFMWlWoFFDMtftQu+I7uVU9tLTdQSmgaGp7qbZrCULxUS1FmO3wygNkCBEiRIgQIUKE/004dV7o/jlEiBAhQoQIESJEiBAhQoQIESJE6KRQeB9fe/M9v6qHSGsJkAootE6FidJe0JoJbQmddCo0L6Q3yqriuVJA4d0f2OlJDRTphTDhPB4K7Rm3M6GHYyEVUNx5u8KzQHuhcmnd1JRP1khD1c+1e0e4LcqScCdUtodMaN/42kd56t0cn/p6u8Jq5LrQ/XOIECFChAgRIkSIECFChAgRIkSIECFChAgRIkSI0Gmh8BtwbkK5NWIg9EFcJ327D6I4nbftnChDrQ8XlUpurRGxVPUQ+ELVQ/xcqcSvaENNtAKKwPefHsz3D7I/+2JrROtYOGoxUlojAmWo8b7QB3GSSF0WWmtEVBGO6gof5SlUfWWozX1l0wq1+1B6viqSvhWU32eHVKE9H0KECBEiRIgQIUKECBEiRIjwhYTKUKfOC1fetND9qxQhQoQIX4vwwHmh++cQIUKErgmVN98rwlHdcsnulqhGnjBUJhQe6wikLgutNeJqLBx1FwnVEqOJMtTlfa1pZhArXRbRd18yMqIltbW8AAAAAElFTkSuQmCC");
+}
+
+h1,p,ul {
+display: inline;
+margin: 5px;
+}
+
+li {
+    font-style: italic;
+}
+
+section {
+    /* design */
+    background-color: var(--bg2);
+    border: var(--primary) 10px solid;
+
+    /* size */
+    width: 30%;
+    padding: 1%;
+
+    /* content alignment */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    rotate: -10deg;
+}
+
+img {
+    height: 70hv;
+    rotate: 20deg;
+}

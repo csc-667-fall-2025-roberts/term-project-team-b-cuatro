@@ -9,6 +9,7 @@
     --primary: #e63946;
     --primary-dark: #d62828;
     --bg: #ffffff;
+    --bg2: #f9f9f9;
     --shadow: 0 4px 12px rgba(0,0,0,0.1);
     --radius: 8px;
 }
@@ -18,7 +19,7 @@
 -------------------------------- */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f9f9f9;
+    background: var(--bg2);
     margin: 0;
     padding: 0;
     display: flex;
