@@ -469,8 +469,8 @@ button:not(form button) {
 
 .game-chat .chat-input button {
     width: 100%;
-    padding: 12px;
-    border-radius: 8px;
+    padding: 11px;
+    border-radius: 6px;
     border: none;
     background: var(--primary);
     color: #fff;
@@ -537,7 +537,7 @@ button:not(form button) {
 .pile-label {
     text-align: center;
     font-size: 0.8rem;
-    margin-bottom: 0.25rem;
+    margin-bottom: 1.15rem;
     color: #4b5563;
 }
 
