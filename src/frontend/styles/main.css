@@ -172,6 +172,10 @@ button:not(form button) {
     color: var(--primary);
 }
 
+.lobby-chat {
+    height: 100%;
+}
+
 /* -------------------------------
    Chat Styles (shared)
 -------------------------------- */

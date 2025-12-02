@@ -1,18 +1,68 @@
-.welcome-card {
+/* ============================
+   HOME PAGE — index.html ONLY
+============================ */
+
+.home-container {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    justify-content: space-around;
-    width: 60vw;
-    bottom: 20vh;
-    left:0;
-    right:0;
-    margin: auto;
-    margin-top: 10vh;
+    padding: 3rem 1rem;
 }
 
-button {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    min-width: 20vw;
+.welcome-box {
+    background: #ffffff;
+    width: 420px;
+    padding: 2.5rem 2rem;
+    border-radius: 25px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    text-align: center;
 }
+
+.welcome-box h2 {
+    margin-top: 0;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-box p {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.welcome-box .btn {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Base Button Style (both Login + Sign Up) */
+.welcome-box .btn {
+    width: 100%;
+    padding: 0.9rem;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: 2px solid var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--primary);   /* RED by default */
+    color: #fff;                  /* white text */
+    font-weight: 500;
+}
+
+/* Hover → turn white */
+.welcome-box .btn:hover {
+    background: #fff;             /* white background */
+    color: var(--primary);        /* red text */
+}
+
+/* Remove the old .secondary styling entirely */
+
