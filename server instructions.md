@@ -1,0 +1,8 @@
+# How to Run Express Server
+Leaving you guys some notes so you can run the server on your own computers. Node modules have to be installed per computer, node_modules folder is in gitignore for a reason please don't remove it!!
+## Step 1 - Open a Git Bash Terminal
+In my experience, using the regular windows terminal hasn't worked. Luckily, when you installed git, there's also a built in terminal! It should appear in the right click menu, same as when you create a folder on your desktop. You may need to click to see more options. If this doesn't work, you should be able to find it using the windows search bar, as it is just a runnable program, just make sure to cd to the project root! If it still doesn't show up, you may just need to install git again. 
+## Step 2 - Install Packages
+In the git bash terminal, run the command `npm install` to install all the required packages. Since packages will differ a bit computer to computer, you may receive a message saying you have vulnerabilites. The terminal should guide you from there, usually it'll have you run the commands `npm audit`/`npm audit report`, and from there `npm audit fix`. In my testing, this was the last of it, but there is a chance you'll need more
+## Step 3 - Run Server
+You can either run the command `npm run dev` from the git bash terminal, OR you can run the `start.bat` file I made which runs the npm run command for you, for ease of use in the future :D
