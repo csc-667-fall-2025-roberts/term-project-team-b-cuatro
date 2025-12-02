@@ -14,29 +14,41 @@
         <h1>UNO Lobby</h1>
         <nav class="user-nav">
             <span class="user-info">Logged in as: <strong>{{username}}</strong></span>
+            <br>
             <a class="logout-btn" href="index.html">Logout</a>
         </nav>
     </header>
 
     <main>
-        <section id="createGame">
+        <section id="create-game" class="form-card">
             <h1>Create New Game Session</h1>
-            <p>Each game will have four players. Once you've created a game, up to 3 other players can join. Should you wish to play alone, start the session without any players and your game will automatically fill with bots. </p>
             <form action="/api/games" method="POST">
-                <label for="num">Game Name</label>
-                <input type="text" id="game-name-bots" name="name" placeholder="Enter game name" required />
 
-                <button type="submit">Create Session</button> <!-- /api/games/start -->
+                <label for="num">Nickname</label>
+                <input type="text" id="room-name" name="name" value="{{username}}" placeholder="Nickname" required />
+
+                <label for="num">Number of Bot Players</label>
+                <input type="number" id="game-name-bots" name="bots" placeholder="0" required />
+
+                <button type="submit">Create Session</button> <!-- /api/games/create -->
             </form>
+            <!-- once a room is created, remove this section, add in a section showing the room code + players in game -->
+            <!-- once a room is created, remove join-game -->
+            <!-- /api/games/start -->
         </section>
-        <section id="joinGame">
+        <section id="join-game" class="form-card">
             <h1>Join Game</h1>
             <form action="/api/games" method="POST">
-                <label for="num">Game Name</label>
-                <input type="text" id="game-name-bots" name="name" placeholder="Enter game name" required />
+                <label for="num">Nickname</label>
+                <input type="text" id="room-name" name="name" value="{{username}}" placeholder="Nickname" required />
 
-                <button type="submit">Join Session</button> <!-- /api/games/start -->
-            </form> 
+                <label for="num">Room Code (Provided by Game Host)</label>
+                <input type="text" id="room-name" name="name" placeholder="Room Code" required />
+
+                <button type="submit">Join Session</button> <!-- /api/games/join -->
+            </form>
+            <!-- once a game is joined, delete this section, add in a "waiting for host..." prompt -->
+            <!-- once a game is joined, delete create-game -->
         </section>               
     </main>
 </body>
