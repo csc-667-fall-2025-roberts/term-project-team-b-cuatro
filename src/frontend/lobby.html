@@ -18,69 +18,26 @@
         </nav>
     </header>
 
-    <main class="lobby-layout">
-        <!-- Left Column: Game Controls -->
-        <section class="lobby-left">
-            <!-- Create Game vs Bots -->
-            <div class="card create-game-card">
-            <h2>Create Game vs Bots</h2>
-            <form action="/games/create-bots" method="POST">
-                <label for="game-name-bots">Game Name</label>
+    <main>
+        <section id="createGame">
+            <h1>Create New Game Session</h1>
+            <p>Each game will have four players. Once you've created a game, up to 3 other players can join. Should you wish to play alone, start the session without any players and your game will automatically fill with bots. </p>
+            <form action="/api/games" method="POST">
+                <label for="num">Game Name</label>
                 <input type="text" id="game-name-bots" name="name" placeholder="Enter game name" required />
 
-                <label for="num-bots">Number of Bots</label>
-                <input type="number" id="num-bots" name="num_bots" min="1" max="3" value="3" required />
-
-                <button type="submit">Start Game</button>
+                <button type="submit">Create Session</button> <!-- /api/games/start -->
             </form>
-        </div>
-
-            <!-- Create Room -->
-            <div class="card create-room-card">
-                <h2>Create Game Room</h2>
-                <form action="/games/create-room" method="POST">
-                    <label for="room-name">Room Name</label>
-                    <input type="text" id="room-name" name="name" placeholder="Enter room name" required />
-
-                    <label for="max-players">Max Players</label>
-                    <input type="number" id="max-players" name="max_players" min="2" max="4" value="4" required />
-
-                    <button type="submit">Create Room</button>
-                </form>
-            </div>
-
-            <!-- Join Room by Code -->
-            <div class="card join-room-card">
-                <h2>Join Room</h2>
-                <form action="/games/join" method="POST">
-                    <label for="room-code">Enter Room Code</label>
-                    <input type="text" id="room-code" name="room_code" placeholder="Room Code" required />
-                    <button type="submit">Join Room</button>
-                </form>
-            </div>
-
-            <!-- Available Rooms -->
-            <div class="card game-list-card">
-                <h2>Available Rooms</h2>
-                <ul class="game-list">
-                    {{game_list}}
-                </ul>
-            </div>
         </section>
+        <section id="joinGame">
+            <h1>Join Game</h1>
+            <form action="/api/games" method="POST">
+                <label for="num">Game Name</label>
+                <input type="text" id="game-name-bots" name="name" placeholder="Enter game name" required />
 
-        <!-- Right Column: Chat -->
-        <section class="lobby-right">
-            <div class="card chat-card">
-                <h2>Lobby Chat</h2>
-                <div class="chat-messages" id="chat-messages">
-                    {{messages}}
-                </div>
-                <form action="/messages/send" method="POST" class="chat-input">
-                    <input type="text" name="message" placeholder="Type a message..." required />
-                    <button type="submit">Send</button>
-                </form>
-            </div>
-        </section>
+                <button type="submit">Join Session</button> <!-- /api/games/start -->
+            </form> 
+        </section>               
     </main>
 </body>
 </html>
