@@ -10,7 +10,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(morgan("dev"));
-app.use(express.static(path.join("dist", "public")));
+app.use(express.static(path.join(__dirname, "../frontend")));
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
