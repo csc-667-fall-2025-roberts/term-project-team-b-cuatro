@@ -8,9 +8,9 @@
     "dev": "nodemon --watch src --ext ts --exec ts-node src/backend/server.ts",
     "build": "tsc",
     "start": "node dist/backend/server.js",
-    
     "migrate:up": "node-pg-migrate up -m src/backend/databases/migrations",
-    "migrate:down": "node-pg-migrate down -m src/backend/databases/migrations"
+    "migrate:down": "node-pg-migrate down -m src/backend/databases/migrations",
+    "migrate": "node-pg-migrate -m src/backend/databases/migrations -d postgres://postgres:070504@localhost:5435/uno_game up"
   },
   "repository": {
     "type": "git",
@@ -25,19 +25,23 @@
   },
   "homepage": "https://github.com/csc-667-fall-2025-roberts/term-project-team-b-cuatro#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "http-errors": "^2.0.1",
-    "morgan": "^1.10.1",
-    "node-pg-migrate": "^8.0.3",
-    "pg": "^8.16.3"
+    "morgan": "^1.10.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.5",
     "@types/http-errors": "^2.0.5",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.10.1",
+    "@types/pg": "^8.15.6",
+    "node-pg-migrate": "^7.6.1",
     "nodemon": "^3.1.11",
+    "pg": "^8.16.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
