@@ -38,6 +38,9 @@ exports.up = (pgm) =>{
         joined_at: 'timestamp_now',
 
     });//end of game players
+
+    //making sure we get no duplicate players
+    pgm.addConstraint('players', 'players_unique_game_user',{unique: ['game_id', 'user_id']});
     //------------------------------------------------------------------------------
     pgm.createTable('messages', {
         id: 'id',
@@ -47,12 +50,31 @@ exports.up = (pgm) =>{
         created_at: 'timestamp_now'
     });//end of messages
     //------------------------------------------------------------------------------
-    //TODO: Future maybe add some index for players 
+    pgm.addIndex('games', 'created_by', { name: 'idx_games_created_by' });
+    pgm.addIndex('games', 'state', { name: 'idx_games_state' });
+    pgm.addIndex('games', 'created_at', { name: 'idx_games_created_at' });
+
+    pgm.addIndex('players', 'game_id', { name: 'idx_players_game_id' });
+    pgm.addIndex('players', 'user_id', { name: 'idx_players_user_id' });
+
+    pgm.addIndex('messages', ['game_id', 'created_at'], {name: 'idx_messages_game_created_at'});
+
+    //TODO: Future maybe add some index for cards/deck
     //------------------------------------------------------------------------------
 
 
 }
 exports.down = (pgm) => {
+  pgm.dropIndex('messages', ['game_id', 'created_at'], {name: 'idx_messages_game_created_at'});
+
+  pgm.dropIndex('players', 'user_id', { name: 'idx_players_user_id'});
+  pgm.dropIndex('players', 'game_id', { name: 'idx_players_game_id' });
+  pgm.dropConstraint('players', 'players_unique_game_user');
+
+  pgm.dropIndex('games', 'created_at', { name: 'idx_games_created_at' });
+  pgm.dropIndex('games', 'state', { name: 'idx_games_state' });
+  pgm.dropIndex('games', 'created_by', { name: 'idx_games_created_by' });
+
   pgm.dropTable('messages');
   pgm.dropTable('players');
   pgm.dropTable('games');
