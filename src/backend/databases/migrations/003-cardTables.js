@@ -1,15 +1,25 @@
 //handeling all my enums: card color, card number, card status, state
-exports.shorthands = {};
+exports.shorthands = {
+    id: {
+        type: 'serial',
+        primaryKey: true,
+  },
+    timestamp_now: {
+        type: 'timestamptz',
+        notNull: true,
+        default: 'now()',
+  },
+};//end of shorthands
 
 exports.up = (pgm) =>{
     //------------------------------------------------------------------------------
-    pgm.createType('card',{
+    pgm.createTable('card',{
         id: 'id',
         color: { type: 'card_color',  notNull: true },
         number: { type: 'card_num', notNull: true },
     });//end of card
     //------------------------------------------------------------------------------
-    pgm.createType('deck',{
+    pgm.createTable('deck',{
         id: 'id',
         card_id: { type: 'integer', notNull: true, references: '"card"', onDelete: 'CASCADE'},
         game_id: {type: 'integer', notNull: true, references: '"games"', onDelete: 'CASCADE'},
@@ -23,6 +33,6 @@ exports.up = (pgm) =>{
 
 };
 exports.down = (pgm) =>{
-    pgm.dropType('deck');
-    pgm.dropType('card');
+    pgm.dropTable('deck');
+    pgm.dropTable('card');
 };

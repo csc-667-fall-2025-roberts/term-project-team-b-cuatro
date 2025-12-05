@@ -1,0 +1,7 @@
+{
+  "user": "postgres",
+  "password": "070504",
+  "host": "localhost",
+  "port": 5435,
+  "name": "uno_game"
+}
