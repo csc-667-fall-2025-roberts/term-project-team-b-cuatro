@@ -85,6 +85,7 @@ router.post("/auth/login", async (req, res, next) => {
         
         if(await bcrypt.compare(password, user.password_hash)){
           return res.sendFile(path.join(__dirname, "../../frontend/lobby.html"));
+          // return res.render("lobby", { username: user.username });
         }
         
         console.log(bcrypt.hash(password, 10))

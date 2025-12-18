@@ -1,6 +1,7 @@
 // package imports
 import * as path from "path";
 import express from "express";
+import session from "express-session";
 import morgan from "morgan";
 import createHttpError from "http-errors";
 
@@ -19,6 +20,15 @@ app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
+app.use(session({
+  secret: 'session_id',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 3*10**10,
+    secure: process.env.NODE_ENV === 'production'
+  }
+}))
 
 // routing
 app.use("/", rootRoutes);
