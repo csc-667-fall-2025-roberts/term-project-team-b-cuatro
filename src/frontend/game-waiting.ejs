@@ -58,12 +58,14 @@
   </header>
 
   <main class="waiting-layout">
+
     <!-- LEFT: room info -->
     <section class="card">
       <h2>Room Code: <%= roomCode %></h2>
 
+      <!-- 🔹 PLAYERS LIST (ID ADDED HERE) -->
       <h3>Players</h3>
-      <ul>
+      <ul id="playersList">
         <% players.forEach(p => { %>
           <li><%= p.nickname %></li>
         <% }) %>
@@ -83,23 +85,32 @@
       <div id="chatBox" class="chat-box"></div>
 
       <form id="chatForm" class="chat-form">
-        <input id="chatInput" class="chat-input" type="text" maxlength="200" placeholder="Message as <%= myNickname %>..." />
+        <input
+          id="chatInput"
+          class="chat-input"
+          type="text"
+          maxlength="200"
+          placeholder="Message as <%= myNickname %>..."
+        />
         <button class="chat-send" type="submit">Send</button>
       </form>
     </aside>
   </main>
 
+  <!-- 🔹 SCRIPT SECTION -->
   <script>
     const roomCode = "<%= roomCode %>";
     const chatBox = document.getElementById("chatBox");
     const chatForm = document.getElementById("chatForm");
     const chatInput = document.getElementById("chatInput");
+    const playersList = document.getElementById("playersList");
 
     function formatTime(ts) {
       const d = new Date(ts);
       return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
 
+    // 🔹 LOAD CHAT
     async function loadChat() {
       try {
         const res = await fetch(`/api/games/${roomCode}/chat`);
@@ -125,11 +136,22 @@
         }).join("");
 
         chatBox.scrollTop = chatBox.scrollHeight;
-      } catch (e) {
-        // ignore temporary errors
-      }
+      } catch {}
     }
 
+    // 🔹 LOAD PLAYERS (NO REFRESH NEEDED)
+    async function loadPlayers() {
+      try {
+        const res = await fetch(`/api/games/${roomCode}/players`);
+        const players = await res.json();
+
+        playersList.innerHTML = players
+          .map(p => `<li>${p.nickname}</li>`)
+          .join("");
+      } catch {}
+    }
+
+    // 🔹 SEND CHAT MESSAGE
     chatForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const text = chatInput.value.trim();
@@ -146,8 +168,11 @@
       loadChat();
     });
 
+    // 🔹 INITIAL LOAD + POLLING
     loadChat();
+    loadPlayers();
     setInterval(loadChat, 2000);
+    setInterval(loadPlayers, 2000);
   </script>
 </body>
 </html>

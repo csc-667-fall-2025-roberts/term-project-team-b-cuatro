@@ -12,14 +12,13 @@ type ChatMessage = {
   ts: number;
 };
 
-const chats = new Map<string, ChatMessage[]>(); // key = roomCode
-
 
 type GameRoom = {
   roomCode: string;
   host: string;
   bots: number;
   players: {username: string; nickname:string}[];
+  chat: ChatMessage[];
 };
 
 const games = new Map<string, GameRoom>();
@@ -181,7 +180,8 @@ router.post("/api/games/create", (req, res) => {
         username: req.session.user.username,
         nickname
       }
-    ]
+    ],
+    chat:[]
   };
 
   games.set(roomCode, game);
@@ -235,25 +235,37 @@ router.get("/game/:roomCode", (req, res) => {
     return res.redirect("/lobby");
   }
 
+  // const roomCode = req.params.roomCode.trim().toUpperCase();
   const game = games.get(req.params.roomCode);
-  if (!game) {
-    return res.redirect("/lobby");
-  }
+  if (!game) return res.redirect("/lobby");
 
-  return res.render("game-waiting", {
-    roomCode: game.roomCode,
-    players: game.players,
-    isHost: req.session.game.role === "host",
-    myNickname: req.session.game.nickname
+  const isHost = game.host === req.session.user.username;
+
+return res.render("game-waiting", {
+  roomCode: game.roomCode,
+  players: game.players,
+  chat: game.chat,
+  isHost,
+  myNickname: req.session.game.nickname
+
   });
 });
 
-router.get("/api/games/:roomCode/chat", (req, res) => {
+router.get("/api/games/:roomCode/players", (req, res) => {
   const roomCode = req.params.roomCode.trim().toUpperCase();
-  const messages = chats.get(roomCode) ?? [];
-  res.json(messages.slice(-50)); // last 50 messages
+  const game = games.get(roomCode);
+  if (!game) return res.status(404).json([]);
+  return res.json(game.players);
 });
 
+
+
+router.get("/api/games/:roomCode/chat", (req, res) => {
+  const roomCode = req.params.roomCode.trim().toUpperCase();
+  const game = games.get(roomCode);
+  if (!game) return res.status(404).json([]);
+  return res.json(game.chat.slice(-50));
+});
 
 router.post("/api/games/:roomCode/chat", (req, res) => {
   if (!req.session.user || !req.session.game) {
@@ -262,23 +274,81 @@ router.post("/api/games/:roomCode/chat", (req, res) => {
 
   const roomCode = req.params.roomCode.trim().toUpperCase();
 
-  // only allow posting to the room the user is actually in
   if (req.session.game.roomCode !== roomCode) {
     return res.status(403).send("Not in this room");
   }
+
+  const game = games.get(roomCode);
+  if (!game) return res.status(404).send("Room not found");
 
   const text = (req.body.text || "").toString().trim();
   if (!text) return res.status(400).send("Empty message");
   if (text.length > 200) return res.status(400).send("Message too long");
 
-  const nickname = req.session.game.nickname;
-
-  const arr = chats.get(roomCode) ?? [];
-  arr.push({ nickname, text, ts: Date.now() });
-  chats.set(roomCode, arr);
+  game.chat.push({
+    nickname: req.session.game.nickname,
+    text,
+    ts: Date.now()
+  });
 
   return res.status(201).json({ ok: true });
 });
+
+
+
+// router.post("/api/games/:roomCode", (req, res) => {
+//   if (!req.session.user || !req.session.game) {
+//     return res.status(401).send("Not logged in");
+//   }
+
+//   const roomCode = req.params.roomCode.trim().toUpperCase();
+
+//   // only allow posting to the room the user is actually in
+//   if (req.session.game.roomCode !== roomCode) {
+//     return res.status(403).send("Not in this room");
+//   }
+
+//   const text = (req.body.text || "").toString().trim();
+//   if (!text) return res.status(400).send("Empty message");
+//   if (text.length > 200) return res.status(400).send("Message too long");
+
+//   const nickname = req.session.game.nickname;
+
+//   const arr = chats.get(roomCode) ?? [];
+//   arr.push({ nickname, text, ts: Date.now() });
+//   chats.set(roomCode, arr);
+
+//   return res.status(201).json({ ok: true });
+// });
+
+
+// router.post("/api/chat/:roomCode", (req, res) => {
+//   if (!req.session.user || !req.session.game) {
+//     return res.redirect("/lobby");
+//   }
+
+//   const game = games.get(req.params.roomCode);
+//   if (!game) {
+//     return res.redirect("/lobby");
+//   }
+
+//   const message = req.body.message;
+//   if (!message) {
+//     return res.redirect(`/game/${req.params.roomCode}`);
+//   }
+
+//   game.chat.push({
+//     sender: req.session.game.nickname,
+//     text: message,
+//     time: new Date().toLocaleTimeString([], {
+//       hour: "2-digit",
+//       minute: "2-digit"
+//     })
+//   });
+
+//   return res.redirect(`/game/${req.params.roomCode}`);
+// });
+
 
 
 
