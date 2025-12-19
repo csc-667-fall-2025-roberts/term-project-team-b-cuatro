@@ -1,5 +1,6 @@
 import express from "express";
-
+import { runBotTurn } from "./bots";
+import { scheduleBotTurns } from "./bots";
 
 type ChatMessage = {
   nickname: string;
@@ -7,27 +8,27 @@ type ChatMessage = {
   ts: number;
 };
 
-type UnoColor = "red" | "yellow" | "green" | "blue" | "wild";
-type UnoValue =
+export type UnoColor = "red" | "yellow" | "green" | "blue" | "wild";
+export type UnoValue =
     | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
     | "skip" | "reverse" | "draw2"
     | "wild" | "wild_draw4";
 
-type UnoCard = {
+export type UnoCard = {
     id: string;         // unique id for click/play
     color: UnoColor;
     value: UnoValue;
 };
 
-type Player = {
+export type Player = {
     username: string;
     nickname: string;
     hand?: UnoCard[];
 };
 
-type GameStatus = "waiting" | "running" | "finished";
+export type GameStatus = "waiting" | "running" | "finished";
 
-type GameRoom = {
+export type GameRoom = {
     roomCode: string;
     host: string;
     bots: number;
@@ -191,7 +192,7 @@ gamesApiRouter.post("/create", (req, res) => {
         awaitingWildColor: false,
     };
 
-    // ✅ Add bots as players right away (no hands yet)
+    // Add bots as players right away (no hands yet)
 for (let i = 0; i < botCount; i++) {
     game.players.push({
         username: `BOT_${i + 1}`,
@@ -335,11 +336,22 @@ gamesApiRouter.post("/:roomCode/draw", (req, res) => {
         drawCards(game, player, game.pendingDraw);
         game.pendingDraw = 0;
         nextTurn(game, 1);
+
+        // Bot AI
+        while (
+            game.status === "running" &&
+            game.players[game.currentTurnIndex]?.username.startsWith("BOT_")
+        ) {
+            runBotTurn(game);
+        }
         return res.json({ ok: true });
     }
 
     drawCards(game, player, 1);
     nextTurn(game, 1);
+
+    // Bot AI
+    scheduleBotTurns(game);
     return res.json({ ok: true });
 });
 
@@ -409,6 +421,9 @@ gamesApiRouter.post("/:roomCode/play", (req, res) => {
     if (player.hand.length === 0) {
         game.status = "finished";
     }
+
+    // Bot AI
+    scheduleBotTurns(game);
 
     return res.json({ ok: true });
 });
@@ -480,7 +495,7 @@ gamePageRouter.get("/:roomCode", (req, res) => {
 
     const isHost = game.host === req.session.user.username;
 
-    // ✅ If not running, show waiting room (host can start)
+    // If not running, show waiting room (host can start)
     if (game.status !== "running") {
         return res.render("game-waiting", {
         roomCode: game.roomCode,
@@ -491,7 +506,7 @@ gamePageRouter.get("/:roomCode", (req, res) => {
         });
     }
 
-    // ✅ If running, show the real game UI
+    // If running, show the real game UI
     const me = req.session.user.username;
     const opponents = game.players
         .filter(p => p.username !== me)
