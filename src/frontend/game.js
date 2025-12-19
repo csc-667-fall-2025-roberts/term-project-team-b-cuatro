@@ -94,7 +94,19 @@ function render(state) {
   // Info bar (optional IDs)
   if (infoGameName) infoGameName.textContent = roomCode;
   if (infoPlayerCount) infoPlayerCount.textContent = `${state.players.length}`;
-  if (infoTurn) infoTurn.textContent = state.currentTurnUsername;
+  if (infoTurn) {
+    const username = state.currentTurnUsername ?? "";
+    const p = state.players?.find(x => x.username === username);
+
+    // default: show nickname if available, otherwise username
+    let label = p?.nickname ?? username ?? "—";
+
+    // if it's a bot like BOT_1 / BOT_2 / BOT_3, show Bot 1/2/3
+    const m = /^BOT_(\d+)$/.exec(username);
+    if (m) label = `Bot ${m[1]}`;
+
+    infoTurn.textContent = label || "—";
+  }
 
   // Discard pile (top card)
   discardPileEl.innerHTML = "";
