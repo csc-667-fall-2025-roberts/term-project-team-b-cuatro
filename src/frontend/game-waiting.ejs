@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UNO Waiting Room</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+  <style>
+    .waiting-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      padding: 24px;
+      align-items: start;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      padding: 18px;
+    }
+    .chat-box {
+      height: 360px;
+      overflow-y: auto;
+      border: 1px solid #e6e6e6;
+      border-radius: 10px;
+      padding: 10px;
+      background: #fafafa;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    .chat-msg { margin: 6px 0; }
+    .chat-name { font-weight: 700; }
+    .chat-time { color: #777; font-size: 12px; margin-left: 6px; }
+    .chat-form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+    .chat-input {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      outline: none;
+    }
+    .chat-send {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <h1>UNO Waiting Room</h1>
+  </header>
+
+  <main class="waiting-layout">
+    <!-- LEFT: room info -->
+    <section class="card">
+      <h2>Room Code: <%= roomCode %></h2>
+
+      <h3>Players</h3>
+      <ul>
+        <% players.forEach(p => { %>
+          <li><%= p.nickname %></li>
+        <% }) %>
+      </ul>
+
+      <% if (isHost) { %>
+        <p>You are the host.</p>
+        <button disabled>Start Game (next)</button>
+      <% } else { %>
+        <p>Waiting for host to start…</p>
+      <% } %>
+    </section>
+
+    <!-- RIGHT: chat -->
+    <aside class="card">
+      <h3>Lobby Chat</h3>
+      <div id="chatBox" class="chat-box"></div>
+
+      <form id="chatForm" class="chat-form">
+        <input id="chatInput" class="chat-input" type="text" maxlength="200" placeholder="Message as <%= myNickname %>..." />
+        <button class="chat-send" type="submit">Send</button>
+      </form>
+    </aside>
+  </main>
+
+  <script>
+    const roomCode = "<%= roomCode %>";
+    const chatBox = document.getElementById("chatBox");
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+
+    function formatTime(ts) {
+      const d = new Date(ts);
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+
+    async function loadChat() {
+      try {
+        const res = await fetch(`/api/games/${roomCode}/chat`);
+        const messages = await res.json();
+
+        chatBox.innerHTML = messages.map(m => {
+          const safeText = String(m.text)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;");
+          const safeName = String(m.nickname)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;");
+
+          return `
+            <div class="chat-msg">
+              <span class="chat-name">${safeName}:</span>
+              <span>${safeText}</span>
+              <span class="chat-time">${formatTime(m.ts)}</span>
+            </div>
+          `;
+        }).join("");
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (e) {
+        // ignore temporary errors
+      }
+    }
+
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      chatInput.value = "";
+
+      await fetch(`/api/games/${roomCode}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+
+      loadChat();
+    });
+
+    loadChat();
+    setInterval(loadChat, 2000);
+  </script>
+</body>
+</html>

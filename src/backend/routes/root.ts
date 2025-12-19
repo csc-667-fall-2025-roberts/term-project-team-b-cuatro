@@ -5,6 +5,35 @@ import path from "path";
 import { pool } from "../databases/db";
 import bcrypt from "bcrypt";
 
+
+type ChatMessage = {
+  nickname: string;
+  text: string;
+  ts: number;
+};
+
+const chats = new Map<string, ChatMessage[]>(); // key = roomCode
+
+
+type GameRoom = {
+  roomCode: string;
+  host: string;
+  bots: number;
+  players: {username: string; nickname:string}[];
+};
+
+const games = new Map<string, GameRoom>();
+
+function generateRoomCode(length = 6){
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < length; i++){
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return code;
+}
+
+
 // routing to index
 const router = express.Router();
 router.get("/", (_req, res) => {
@@ -19,6 +48,9 @@ router.get("/lobby", (req, res)=> {
   }
   return res.render("lobby", {username: req.session.user.username});
 });
+
+
+
 
 // ---------- API ENDPOINTS ----------
 
@@ -119,6 +151,134 @@ router.post("/auth/logout", (req, res) => {
 });
 
 
+router.post("/api/games/create", (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).send("Not logged in");
+  }
+
+  const { nickname, bots } = req.body;
+
+  if (!nickname) {
+    return res.status(400).send("Missing nickname");
+  }
+
+  const botCount = Number(bots);
+  if (isNaN(botCount) || botCount < 0 || botCount > 9) {
+    return res.status(400).send("Invalid bot count");
+  }
+
+  let roomCode = generateRoomCode();
+  while (games.has(roomCode)) {
+    roomCode = generateRoomCode();
+  }
+
+  const game: GameRoom = {
+    roomCode,
+    host: req.session.user.username,
+    bots: botCount,
+    players: [
+      {
+        username: req.session.user.username,
+        nickname
+      }
+    ]
+  };
+
+  games.set(roomCode, game);
+
+  // store game info in session
+  req.session.game = {
+    roomCode,
+    role: "host",
+    nickname
+  };
+
+  return res.redirect(`/game/${roomCode}`);
+});
+
+
+router.post("/api/games/join", (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).send("Not logged in");
+  }
+
+  const { nickname, roomCode } = req.body;
+
+  if (!nickname || !roomCode) {
+    return res.status(400).send("Missing fields");
+  }
+
+  const code = roomCode.trim().toUpperCase();
+  const game = games.get(code);
+
+  if (!game) {
+    return res.status(404).send("Room not found");
+  }
+
+  game.players.push({
+    username: req.session.user.username,
+    nickname
+  });
+
+  req.session.game = {
+    roomCode: code,
+    role: "player",
+    nickname
+  };
+
+  return res.redirect(`/game/${code}`);
+});
+
+
+router.get("/game/:roomCode", (req, res) => {
+  if (!req.session.user || !req.session.game) {
+    return res.redirect("/lobby");
+  }
+
+  const game = games.get(req.params.roomCode);
+  if (!game) {
+    return res.redirect("/lobby");
+  }
+
+  return res.render("game-waiting", {
+    roomCode: game.roomCode,
+    players: game.players,
+    isHost: req.session.game.role === "host",
+    myNickname: req.session.game.nickname
+  });
+});
+
+router.get("/api/games/:roomCode/chat", (req, res) => {
+  const roomCode = req.params.roomCode.trim().toUpperCase();
+  const messages = chats.get(roomCode) ?? [];
+  res.json(messages.slice(-50)); // last 50 messages
+});
+
+
+router.post("/api/games/:roomCode/chat", (req, res) => {
+  if (!req.session.user || !req.session.game) {
+    return res.status(401).send("Not logged in");
+  }
+
+  const roomCode = req.params.roomCode.trim().toUpperCase();
+
+  // only allow posting to the room the user is actually in
+  if (req.session.game.roomCode !== roomCode) {
+    return res.status(403).send("Not in this room");
+  }
+
+  const text = (req.body.text || "").toString().trim();
+  if (!text) return res.status(400).send("Empty message");
+  if (text.length > 200) return res.status(400).send("Message too long");
+
+  const nickname = req.session.game.nickname;
+
+  const arr = chats.get(roomCode) ?? [];
+  arr.push({ nickname, text, ts: Date.now() });
+  chats.set(roomCode, arr);
+
+  return res.status(201).json({ ok: true });
+});
 
 
 

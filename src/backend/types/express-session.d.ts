@@ -7,5 +7,10 @@ declare module "express-session" {
       username: string;
       email: string;
     };
+    game?: {
+      roomCode: string;
+      role: "host" | "player";
+      nickname: string;
+    };
   }
 }
