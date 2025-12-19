@@ -58,12 +58,10 @@
   </header>
 
   <main class="waiting-layout">
-
-    <!-- LEFT: room info -->
+    <!-- LEFT -->
     <section class="card">
       <h2>Room Code: <%= roomCode %></h2>
 
-      <!-- 🔹 PLAYERS LIST (ID ADDED HERE) -->
       <h3>Players</h3>
       <ul id="playersList">
         <% players.forEach(p => { %>
@@ -73,7 +71,7 @@
 
       <% if (isHost) { %>
         <p>You are the host.</p>
-        <button disabled>Start Game (next)</button>
+        <button id="startBtn">Start Game</button>
       <% } else { %>
         <p>Waiting for host to start…</p>
       <% } %>
@@ -97,20 +95,19 @@
     </aside>
   </main>
 
-  <!-- 🔹 SCRIPT SECTION -->
   <script>
     const roomCode = "<%= roomCode %>";
     const chatBox = document.getElementById("chatBox");
     const chatForm = document.getElementById("chatForm");
     const chatInput = document.getElementById("chatInput");
     const playersList = document.getElementById("playersList");
+    const startBtn = document.getElementById("startBtn");
 
     function formatTime(ts) {
       const d = new Date(ts);
       return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
 
-    // 🔹 LOAD CHAT
     async function loadChat() {
       try {
         const res = await fetch(`/api/games/${roomCode}/chat`);
@@ -139,24 +136,18 @@
       } catch {}
     }
 
-    // 🔹 LOAD PLAYERS (NO REFRESH NEEDED)
     async function loadPlayers() {
       try {
         const res = await fetch(`/api/games/${roomCode}/players`);
         const players = await res.json();
-
-        playersList.innerHTML = players
-          .map(p => `<li>${p.nickname}</li>`)
-          .join("");
+        playersList.innerHTML = players.map(p => `<li>${p.nickname}</li>`).join("");
       } catch {}
     }
 
-    // 🔹 SEND CHAT MESSAGE
     chatForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const text = chatInput.value.trim();
       if (!text) return;
-
       chatInput.value = "";
 
       await fetch(`/api/games/${roomCode}/chat`, {
@@ -168,11 +159,37 @@
       loadChat();
     });
 
-    // 🔹 INITIAL LOAD + POLLING
+    // Host starts game
+    if (startBtn) {
+      startBtn.addEventListener("click", async () => {
+        startBtn.disabled = true;
+        const res = await fetch(`/api/games/${roomCode}/start`, { method: "POST" });
+        if (!res.ok) {
+          alert(await res.text());
+          startBtn.disabled = false;
+        }
+      });
+    }
+
+    // Everyone redirects when game starts
+    async function checkStart() {
+      try {
+        const res = await fetch(`/api/games/${roomCode}/state`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.status === "running") {
+          window.location.href = `/game/${roomCode}`;
+        }
+      } catch {}
+    }
+
     loadChat();
     loadPlayers();
+    checkStart();
+
     setInterval(loadChat, 2000);
     setInterval(loadPlayers, 2000);
+    setInterval(checkStart, 1000);
   </script>
 </body>
 </html>

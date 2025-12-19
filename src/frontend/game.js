@@ -1,81 +1,146 @@
-// -----------------------------
-// Card definitions
-// -----------------------------
-const colors = ["red", "green", "blue", "yellow"];
-const numbers = [0,1,2,3,4,5,6,7,8,9];
-const actions = ["skip", "reverse", "draw2"]; // colored action cards
-const wilds = ["wild", "draw4"];              // colorless wild cards
+const parts = window.location.pathname.split("/").filter(Boolean);
+const roomCode = parts[parts.length - 1];
 
-// -----------------------------
-// Helper function for special card symbols
-// -----------------------------
+if (!roomCode || parts[0] !== "game") {
+  alert("Missing room code in URL. Expected /game/XXXXXX");
+}
+
+// --- same symbol helper idea you had before ---
 function cardSymbol(card) {
-    switch(card.type) {
-        case "skip": return "⏭";
-        case "reverse": return "🔄";
-        case "draw2": return "+2";
-        case "wild": return "";   // regular wild has no symbol in center
-        case "draw4": return "+4";
-        default: return card.value; // number cards
-    }
+  const v = String(card.value);
+  if (v === "skip") return "⏭";
+  if (v === "reverse") return "🔄";
+  if (v === "draw2") return "+2";
+  if (v === "wild") return "W";
+  if (v === "wild_draw4") return "+4";
+  return v; // numbers "0".."9"
 }
 
-// -----------------------------
-// Generate example player hand
-// -----------------------------
-const playerHand = document.getElementById("player-hand");
-
-for (let i = 0; i < 7; i++) {
-    let cardTypeRoll = Math.random();
-    let card = {};
-
-    if (cardTypeRoll < 0.7) {
-        // 70% chance number card
-        card.type = "number";
-        card.color = colors[Math.floor(Math.random() * colors.length)];
-        card.value = numbers[Math.floor(Math.random() * numbers.length)];
-    } else if (cardTypeRoll < 0.9) {
-        // 20% chance action card
-        card.type = actions[Math.floor(Math.random() * actions.length)];
-        card.color = colors[Math.floor(Math.random() * colors.length)];
-        card.value = card.type;
-    } else {
-        // 10% chance wild card
-        card.type = wilds[Math.floor(Math.random() * wilds.length)];
-        card.color = "wild";
-        card.value = card.type;
-    }
-
-    const symbol = cardSymbol(card);
-
-    const cardDiv = document.createElement("div");
-    cardDiv.className = `uno-card ${card.color} ${card.type}`;
-    cardDiv.innerHTML = `
-        <span class="card-top-left">${symbol}</span>
-        <span class="card-center"><span class="icon">${symbol}</span></span>
-        <span class="card-bottom-right">${symbol}</span>
-    `;
-
-    playerHand.appendChild(cardDiv);
+function cardCssType(card) {
+  const v = String(card.value);
+  if (/^\d+$/.test(v)) return "number";
+  if (v === "wild" || v === "wild_draw4") return v === "wild_draw4" ? "draw4" : "wild";
+  return v; // skip/reverse/draw2
 }
 
-// -----------------------------
-// Discard pile setup (example card)
-// -----------------------------
-const discardPile = document.getElementById("discard-pile");
-const discardCard = document.createElement("div");
+function renderCardDiv(card, clickable, onClick) {
+  const symbol = cardSymbol(card);
+  const typeClass = cardCssType(card);
+  const colorClass = card.color; // red/green/blue/yellow/wild
 
-// Example: draw4 wild card
-discardCard.className = "uno-card wild draw4";
-discardCard.innerHTML = `
-    <span class="card-top-left">+4</span>
-    <span class="card-center"><span class="icon">+4</span></span>
-    <span class="card-bottom-right">+4</span>
-`;
-discardPile.appendChild(discardCard);
+  const div = document.createElement("div");
+  div.className = `uno-card ${colorClass} ${typeClass}`;
+  div.innerHTML = `
+    <span class="card-top-left">${symbol}</span>
+    <span class="card-center"><span class="icon">${symbol}</span></span>
+    <span class="card-bottom-right">${symbol}</span>
+  `;
 
-// -----------------------------
-// Draw pile placeholder
-// -----------------------------
-const drawPile = document.getElementById("draw-pile");
-drawPile.innerHTML = "Draw Pile";
+  if (clickable) {
+    div.style.cursor = "pointer";
+    div.addEventListener("click", onClick);
+  }
+
+  return div;
+}
+
+// DOM nodes from your existing game.ejs markup (same IDs as before)
+const playerHandEl = document.getElementById("player-hand");
+const discardPileEl = document.getElementById("discard-pile");
+const drawPileEl = document.getElementById("draw-pile");
+
+// Optional: if you add these IDs later, we’ll fill them.
+// If they don’t exist, we just skip.
+const infoGameName = document.getElementById("gameName");
+const infoPlayerCount = document.getElementById("playerCount");
+const infoTurn = document.getElementById("currentTurn");
+
+let lastState = null;
+
+async function fetchState() {
+  const res = await fetch(`/api/games/${roomCode}/state`);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+async function playCard(card) {
+  const body = { cardId: card.id };
+
+  // Wild needs a chosen color
+  if (card.value === "wild" || card.value === "wild_draw4") {
+    const choice = prompt("Choose color: red, yellow, green, blue");
+    body.wildColor = choice;
+  }
+
+  const res = await fetch(`/api/games/${roomCode}/play`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    alert(await res.text());
+  }
+}
+
+async function drawCard() {
+  const res = await fetch(`/api/games/${roomCode}/draw`, { method: "POST" });
+  if (!res.ok) {
+    alert(await res.text());
+  }
+}
+
+function render(state) {
+  // Info bar (optional IDs)
+  if (infoGameName) infoGameName.textContent = roomCode;
+  if (infoPlayerCount) infoPlayerCount.textContent = `${state.players.length}`;
+  if (infoTurn) infoTurn.textContent = state.currentTurnUsername;
+
+  // Discard pile (top card)
+  discardPileEl.innerHTML = "";
+  if (state.topCard) {
+    const top = renderCardDiv(
+      { id: "top", color: state.topCard.color, value: state.topCard.value },
+      false
+    );
+    discardPileEl.appendChild(top);
+  }
+
+  // Draw pile (click to draw)
+  drawPileEl.innerHTML = "";
+  const drawBack = document.createElement("div");
+  drawBack.className = "uno-card";
+  drawBack.textContent = "Draw";
+  drawBack.style.display = "flex";
+  drawBack.style.alignItems = "center";
+  drawBack.style.justifyContent = "center";
+  drawBack.style.cursor = "pointer";
+  drawBack.addEventListener("click", drawCard);
+  drawPileEl.appendChild(drawBack);
+
+  // Your hand
+  playerHandEl.innerHTML = "";
+  state.yourHand.forEach((card) => {
+    const div = renderCardDiv(card, true, () => playCard(card));
+    playerHandEl.appendChild(div);
+  });
+}
+
+async function loop() {
+  try {
+    const state = await fetchState();
+    lastState = state;
+
+    if (state.status === "finished") {
+      alert("Game finished!");
+      return;
+    }
+
+    render(state);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+loop();
+setInterval(loop, 1000);

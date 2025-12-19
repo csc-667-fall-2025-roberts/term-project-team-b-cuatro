@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UNO Game</title>
+
+    <link rel="stylesheet" href="/styles/main.css" />
+</head>
+<body>
+    <header class="site-header">
+        <h1>UNO Game</h1>
+        <nav>
+        <a href="/lobby">Back to Lobby</a>
+        </nav>
+    </header>
+
+    <main class="game-layout">
+
+        <!-- GAME INFO BAR -->
+        <section class="game-info card">
+        <h2>Room: <%= roomCode %></h2>
+        <p>Players: <%= players.length %></p>
+        <p>
+            Turn:
+            <strong>
+            <%= currentPlayer ? currentPlayer.nickname : "—" %>
+            </strong>
+        </p>
+        </section>
+
+        <!-- GAME BOARD -->
+        <section class="game-board card">
+        <div class="game-table-grid">
+
+            <!-- TOP PLAYER -->
+            <div class="player-slot player-top">
+            <div class="player-name">
+                <%= opponents[0]?.nickname || "—" %>
+            </div>
+            <div class="player-meta">
+                <%= opponents[0] ? opponents[0].handCount + " cards" : "" %>
+            </div>
+            </div>
+
+            <!-- LEFT PLAYER -->
+            <div class="player-slot player-left">
+            <div class="player-name">
+                <%= opponents[1]?.nickname || "—" %>
+            </div>
+            <div class="player-meta">
+                <%= opponents[1] ? opponents[1].handCount + " cards" : "" %>
+            </div>
+            </div>
+
+            <!-- CENTER PILES -->
+            <div class="table-center">
+            <div class="pile">
+                <div class="pile-label">Discard</div>
+                <div class="pile-cards" id="discard-pile"></div>
+            </div>
+            <div class="pile">
+                <div class="pile-label">Draw</div>
+                <div class="pile-cards" id="draw-pile"></div>
+            </div>
+            </div>
+
+            <!-- RIGHT PLAYER -->
+            <div class="player-slot player-right">
+            <div class="player-name">
+                <%= opponents[2]?.nickname || "—" %>
+            </div>
+            <div class="player-meta">
+                <%= opponents[2] ? opponents[2].handCount + " cards" : "" %>
+            </div>
+            </div>
+
+        </div>
+        </section>
+
+        <!-- PLAYER HAND -->
+        <section class="player-hand card">
+        <h2>Your Cards</h2>
+        <div class="hand-cards" id="player-hand"></div>
+        </section>
+
+        <!-- GAME CHAT (same logic as lobby) -->
+        <section class="game-chat card">
+        <h2>Game Chat</h2>
+
+        <div id="chatBox" class="chat-box"></div>
+
+        <form id="chatForm" class="chat-input">
+            <input
+            id="chatInput"
+            type="text"
+            maxlength="200"
+            placeholder="Message as <%= myNickname %>..."
+            />
+            <button type="submit">Send</button>
+        </form>
+        </section>
+
+    </main>
+
+    <!-- GAME LOGIC -->
+    <script src="/game.js"></script>
+
+    <!-- CHAT SCRIPT -->
+    <script>
+        const roomCode = "<%= roomCode %>";
+        const chatBox = document.getElementById("chatBox");
+        const chatForm = document.getElementById("chatForm");
+        const chatInput = document.getElementById("chatInput");
+
+        function formatTime(ts) {
+        const d = new Date(ts);
+        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        }
+
+        async function loadChat() {
+        try {
+            const res = await fetch(`/api/games/${roomCode}/chat`);
+            const messages = await res.json();
+
+            chatBox.innerHTML = messages.map(m => {
+            const safeText = String(m.text)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
+            const safeName = String(m.nickname)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
+
+            return `
+                <div class="chat-msg">
+                <span class="chat-name">${safeName}:</span>
+                <span>${safeText}</span>
+                <span class="chat-time">${formatTime(m.ts)}</span>
+                </div>
+            `;
+            }).join("");
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        } catch {}
+        }
+
+        chatForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        chatInput.value = "";
+
+        await fetch(`/api/games/${roomCode}/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text })
+        });
+
+        loadChat();
+        });
+
+        loadChat();
+        setInterval(loadChat, 2000);
+    </script>
+
+</body>
+</html>

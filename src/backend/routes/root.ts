@@ -5,9 +5,11 @@ import path from "path";
 import { pool } from "../databases/db";
 import bcrypt from "bcrypt";
 
+import { games } from "./game";
 
 // routing to index
 const router = express.Router();
+
 router.get("/", (_req, res) => {
   res.sendFile(path.join(__dirname, "../../frontend/index.html"));
 });
@@ -122,7 +124,30 @@ router.post("/auth/logout", (req, res) => {
   });
 });
 
+router.post("/messages/send", (req, res) => {
+  if (!req.session.user || !req.session.game) {
+    return res.redirect("/login.html");
+  }
 
+  const roomCode = String(req.session.game.roomCode || "").trim().toUpperCase();
+  if (!roomCode) return res.redirect("/lobby");
+
+  const game = games.get(roomCode);
+  if (!game) return res.redirect("/lobby");
+
+  const text = String(req.body.message || "").trim();
+  if (!text) return res.redirect(`/game.html?roomCode=${roomCode}`);
+  if (text.length > 200) return res.redirect(`/game.html?roomCode=${roomCode}`);
+
+  game.chat.push({
+    nickname: req.session.game.nickname,
+    text,
+    ts: Date.now(),
+  });
+
+  // game.html lives at /game.html, not /game/:code
+  return res.redirect(`/game.html?roomCode=${roomCode}`);
+});
 
 // router.post("/api/games/:roomCode", (req, res) => {
 //   if (!req.session.user || !req.session.game) {
