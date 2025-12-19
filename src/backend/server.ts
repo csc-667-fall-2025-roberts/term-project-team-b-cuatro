@@ -8,6 +8,7 @@ import createHttpError from "http-errors";
 // file imports
 import rootRoutes from "./routes/root";
 import { testRouter } from "./routes/test";
+import { gamesApiRouter, gamePageRouter } from "./routes/game";
 
 // create express app
 const app = express();
@@ -32,6 +33,8 @@ app.use(session({
 
 // routing
 app.use("/", rootRoutes);
+app.use("/api/games", gamesApiRouter);
+app.use("/game", gamePageRouter);
 app.use("/test", testRouter);
 
 // error handling
