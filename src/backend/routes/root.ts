@@ -1,5 +1,6 @@
 // imports
 import express from "express";
+import session from "express-session";
 import path from "path";
 import { pool } from "../databases/db";
 import bcrypt from "bcrypt";
@@ -11,6 +12,12 @@ router.get("/", (_req, res) => {
 });
 router.post("/", (_req, res) => {
   res.send("you posted");
+});
+router.get("/lobby", (req, res)=> {
+  if(!req.session.user){
+    return res.redirect("/login.html");
+  }
+  return res.render("lobby", {username: req.session.user.username});
 });
 
 // ---------- API ENDPOINTS ----------
@@ -71,7 +78,7 @@ router.post("/auth/login", async (req, res, next) => {
 
         // get and compare passwords for validation
         const query = `
-          SELECT username, password_hash
+          SELECT id, username, email, password_hash
           FROM users
           WHERE username = $1 OR email = $1
           LIMIT 1
@@ -84,7 +91,12 @@ router.post("/auth/login", async (req, res, next) => {
         const user = result.rows[0];
         
         if(await bcrypt.compare(password, user.password_hash)){
-          return res.sendFile(path.join(__dirname, "../../frontend/lobby.html"));
+          req.session.user = {
+            id: user.id,
+            username: user.username,
+            email:user.email
+          };
+          return res.redirect("/lobby");
           // return res.render("lobby", { username: user.username });
         }
         
@@ -99,8 +111,12 @@ router.post("/auth/login", async (req, res, next) => {
     }
 });
 
-
-
+router.post("/auth/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) return res.status(500).send("Logout failed");
+    res.redirect("/");
+  });
+});
 
 
 

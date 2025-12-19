@@ -15,7 +15,7 @@
     <header class="site-header">
         <h1>UNO Lobby</h1>
         <nav class="user-nav">
-            <span class="user-info">Logged in as: <strong>{{username}}</strong></span>
+            <span class="user-info">Logged in as: <strong><%= username %></strong></span>
             <br>
             <a class="logout-btn" href="index.html">Logout</a>
         </nav>
@@ -27,7 +27,7 @@
             <form action="/api/games" method="POST">
 
                 <label for="num">Nickname</label>
-                <input type="text" id="room-name" name="name" value="{{username}}" placeholder="Nickname" required />
+                <input type="text" id="room-name" name="name" value="<%= username %>" placeholder="Nickname" required />
 
                 <label for="num">Number of Bot Players</label>
                 <input type="number" id="game-name-bots" name="bots" placeholder="0" required />
@@ -42,7 +42,7 @@
             <h1>Join Game</h1>
             <form action="/api/games" method="POST">
                 <label for="num">Nickname</label>
-                <input type="text" id="room-name" name="name" value="{{username}}" placeholder="Nickname" required />
+                <input type="text" id="room-name" name="name" value="<%= username %>" placeholder="Nickname" required />
 
                 <label for="num">Room Code (Provided by Game Host)</label>
                 <input type="text" id="room-name" name="name" placeholder="Room Code" required />

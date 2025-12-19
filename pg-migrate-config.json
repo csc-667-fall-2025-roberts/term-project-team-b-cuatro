@@ -1,7 +1,8 @@
 {
-  "user": "postgres",
-  "password": "070504",
   "host": "localhost",
-  "port": 5435,
-  "name": "uno_game"
+  "port": 5432,
+  "database": "uno_game",
+  "user": "postgres",
+  "password": "2424",
+  "ssl": false
 }
