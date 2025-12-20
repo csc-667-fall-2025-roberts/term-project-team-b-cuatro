@@ -3,6 +3,6 @@
   "port": 5432,
   "database": "uno_game",
   "user": "postgres",
-  "password": "2424",
+  "password": "postgres",
   "ssl": false
 }
