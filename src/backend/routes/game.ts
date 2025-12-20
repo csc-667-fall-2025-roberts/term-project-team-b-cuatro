@@ -415,6 +415,7 @@ gamesApiRouter.post("/:roomCode/play", (req, res) => {
     // apply effects
     if (card.value === "reverse") {
         game.direction = (game.direction === 1 ? -1 : 1);
+        nextTurn(game, 1);
     } else if (card.value === "skip") {
         // skip next player
         nextTurn(game, 2);
