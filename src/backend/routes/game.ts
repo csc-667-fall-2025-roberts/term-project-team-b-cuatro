@@ -305,6 +305,7 @@ gamesApiRouter.post("/:roomCode/start", (req, res) => {
 
     // first player's turn
     game.currentTurnIndex = 0;
+    game.chat = [];
     game.status = "running";
 
     scheduleBotTurns(game);
