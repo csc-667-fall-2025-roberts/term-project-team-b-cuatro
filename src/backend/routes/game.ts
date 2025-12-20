@@ -47,6 +47,7 @@ export type GameRoom = {
     awaitingWildColor: boolean;
 };
 
+
 // Game Storage
 export const games = new Map<string, GameRoom>();
 
@@ -169,6 +170,52 @@ function startTurn(game: GameRoom) {
 // Mounted at /api/games
 const gamesApiRouter = express.Router();
 
+const MAX_BOTS = 3;
+const MAX_TOTAL_PLAYERS = 4;
+
+function isValidStartingCard(card: UnoCard) {
+  return (
+    card.value !== "wild" &&
+    card.value !== "wild_draw4" &&
+    card.value !== "skip" &&
+    card.value !== "reverse" &&
+    card.value !== "draw2"
+  );
+}
+
+function startGame(game: GameRoom) {
+  // init deck + deal
+  game.deck = shuffle(createDeck());
+  game.discard = [];
+  game.direction = 1;
+  game.pendingDraw = 0;
+  game.pendingSkip = false;
+  game.awaitingWildColor = false;
+
+  // deal 7 each
+  for (const p of game.players) p.hand = [];
+  for (const p of game.players) drawCards(game, p, 7);
+
+  // flip first non-wild card to discard
+  let first = game.deck.pop();
+  while (first && !isValidStartingCard(first)) {
+    game.deck.unshift(first);
+    first = game.deck.pop();
+  }
+  if (!first) return false;
+
+  game.discard.push(first);
+
+  // first player's turn
+  game.currentTurnIndex = 0;
+  game.chat = [];
+  game.status = "running";
+
+  scheduleBotTurns(game);
+  return true;
+}
+ 
+
 gamesApiRouter.post("/create", (req, res) => {
     if (!req.session.user) {
         return res.status(401).send("Not logged in");
@@ -180,58 +227,70 @@ gamesApiRouter.post("/create", (req, res) => {
         return res.status(400).send("Missing nickname");
     }
 
-    const botCount = Number(bots);
-    if (isNaN(botCount) || botCount < 0 || botCount > 9) {
+
+    const botCountRaw = Number(bots);
+    if (isNaN(botCountRaw) || botCountRaw < 0 || botCountRaw > MAX_BOTS) {
         return res.status(400).send("Invalid bot count");
     }
-
-    let roomCode = generateRoomCode();
-    while (games.has(roomCode)) {
-        roomCode = generateRoomCode();
-    }
-
-    const game: GameRoom = {
-        roomCode,
-        host: req.session.user.username,
-        bots: botCount,
-        players: [
-        {
-            username: req.session.user.username,
-            nickname,
-            hand:[]
+    const botCount = (){
+        if(botCountRaw == 0){
+            return 1;
         }
-        ],
-        chat:[],
+        return botCountRaw;
+    }
+    // -------------------
+//     const botCount = Number(bots);
+//     if (isNaN(botCount) || botCount < 0 || botCount > 3) {
+//         return res.status(400).send("Invalid bot count");
+//     }
 
-        status: "waiting",
-        deck: [],
-        discard: [],
-        currentTurnIndex: 0,
-        direction: 1,
-        pendingDraw: 0,
-        pendingSkip: false,
-        awaitingWildColor: false,
-    };
+//     let roomCode = generateRoomCode();
+//     while (games.has(roomCode)) {
+//         roomCode = generateRoomCode();
+//     }
 
-    // Add bots as players right away (no hands yet)
-for (let i = 0; i < botCount; i++) {
-    game.players.push({
-        username: `BOT_${i + 1}`,
-        nickname: `Bot ${i + 1}`,
-        hand: [] // will be dealt on start
-    });
-    }   
+//     const game: GameRoom = {
+//         roomCode,
+//         host: req.session.user.username,
+//         bots: botCount,
+//         players: [
+//         {
+//             username: req.session.user.username,
+//             nickname,
+//             hand:[]
+//         }
+//         ],
+//         chat:[],
 
-    games.set(roomCode, game);
+//         status: "waiting",
+//         deck: [],
+//         discard: [],
+//         currentTurnIndex: 0,
+//         direction: 1,
+//         pendingDraw: 0,
+//         pendingSkip: false,
+//         awaitingWildColor: false,
+//     };
 
-    // store game info in session
-    req.session.game = {
-        roomCode,
-        role: "host",
-        nickname
-    };
+//     // Add bots as players right away (no hands yet)
+// for (let i = 0; i < botCount; i++) {
+//     game.players.push({
+//         username: `BOT_${i + 1}`,
+//         nickname: `Bot ${i + 1}`,
+//         hand: [] // will be dealt on start
+//     });
+//     }   
 
-    return res.redirect(`/game/${roomCode}`);
+//     games.set(roomCode, game);
+
+//     // store game info in session
+//     req.session.game = {
+//         roomCode,
+//         role: "host",
+//         nickname
+//     };
+
+//     return res.redirect(`/game/${roomCode}`);
 });
 
 
