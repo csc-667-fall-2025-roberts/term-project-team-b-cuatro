@@ -55,6 +55,18 @@ const infoGameName = document.getElementById("gameName");
 const infoPlayerCount = document.getElementById("playerCount");
 const infoTurn = document.getElementById("currentTurn");
 
+const opp0Name = document.getElementById("opp0Name");
+const opp1Name = document.getElementById("opp1Name");
+const opp2Name = document.getElementById("opp2Name");
+
+const opp0Count = document.getElementById("opp0Count");
+const opp1Count = document.getElementById("opp1Count");
+const opp2Count = document.getElementById("opp2Count");
+
+function getMyUsername() {
+  return document.querySelector("main.game-layout")?.dataset?.myUsername || "";
+}
+
 let lastState = null;
 
 async function fetchState() {
@@ -107,6 +119,17 @@ function render(state) {
 
     infoTurn.textContent = label || "—";
   }
+
+  const me = getMyUsername();
+  const opps = (state.players || []).filter(p => p.username !== me);
+
+  if (opp0Name) opp0Name.textContent = opps[0]?.nickname ?? "—";
+  if (opp1Name) opp1Name.textContent = opps[1]?.nickname ?? "—";
+  if (opp2Name) opp2Name.textContent = opps[2]?.nickname ?? "—";
+
+  if (opp0Count) opp0Count.textContent = opps[0] ? `${opps[0].handCount} cards` : "";
+  if (opp1Count) opp1Count.textContent = opps[1] ? `${opps[1].handCount} cards` : "";
+  if (opp2Count) opp2Count.textContent = opps[2] ? `${opps[2].handCount} cards` : "";
 
   // Discard pile (top card)
   discardPileEl.innerHTML = "";

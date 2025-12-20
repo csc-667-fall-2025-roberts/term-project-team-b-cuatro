@@ -143,6 +143,27 @@ function drawCards(room: GameRoom, player: Player, count: number) {
     }
 }
 
+function applyPendingDrawIfAny(game: GameRoom, player: Player) {
+    if (game.pendingDraw > 0) {
+        drawCards(game, player, game.pendingDraw);
+        game.pendingDraw = 0;
+        return true;
+    }
+    return false;
+}
+
+// Call this right after turns advance.
+// If the next player must draw (because of +2/+4), do it immediately and end their turn.
+function startTurn(game: GameRoom) {
+    const player = game.players[game.currentTurnIndex];
+    if (!player) return;
+
+    // If the next player owes cards, they draw and lose the turn.
+    if (applyPendingDrawIfAny(game, player)) {
+        nextTurn(game, 1);
+    }
+}
+
 
 // Router for API endpoints
 // Mounted at /api/games
@@ -286,6 +307,8 @@ gamesApiRouter.post("/:roomCode/start", (req, res) => {
     game.currentTurnIndex = 0;
     game.status = "running";
 
+    scheduleBotTurns(game);
+
     return res.json({ ok: true });
 });
 
@@ -331,24 +354,12 @@ gamesApiRouter.post("/:roomCode/draw", (req, res) => {
     const player = findPlayer(game, req.session.user.username);
     if (!player) return res.status(404).send("Player not found");
 
-    // apply pending draw first
-    if (game.pendingDraw > 0) {
-        drawCards(game, player, game.pendingDraw);
-        game.pendingDraw = 0;
-        nextTurn(game, 1);
-
-        // Bot AI
-        while (
-            game.status === "running" &&
-            game.players[game.currentTurnIndex]?.username.startsWith("BOT_")
-        ) {
-            runBotTurn(game);
-        }
-        return res.json({ ok: true });
+    if (!applyPendingDrawIfAny(game, player)) {
+        drawCards(game, player, 1);
     }
 
-    drawCards(game, player, 1);
     nextTurn(game, 1);
+    startTurn(game);
 
     // Bot AI
     scheduleBotTurns(game);
@@ -421,6 +432,8 @@ gamesApiRouter.post("/:roomCode/play", (req, res) => {
     if (player.hand.length === 0) {
         game.status = "finished";
     }
+
+    startTurn(game);
 
     // Bot AI
     scheduleBotTurns(game);

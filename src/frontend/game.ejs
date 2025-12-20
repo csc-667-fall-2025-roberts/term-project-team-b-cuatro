@@ -37,14 +37,22 @@
 
         <!-- TOP PLAYER -->
         <div class="player-slot player-top">
-          <div class="player-name"><%= opponents[0]?.nickname || "—" %></div>
-          <div class="player-meta"><%= opponents[0] ? opponents[0].handCount + " cards" : "" %></div>
+          <div class="player-name" id="opp0Name">
+            <%= opponents[0]?.nickname || "—" %>
+          </div>
+          <div class="player-meta" id="opp0Count">
+            <%= opponents[0] ? opponents[0].handCount + " cards" : "" %>
+          </div>
         </div>
 
         <!-- LEFT PLAYER -->
         <div class="player-slot player-left">
-          <div class="player-name"><%= opponents[1]?.nickname || "—" %></div>
-          <div class="player-meta"><%= opponents[1] ? opponents[1].handCount + " cards" : "" %></div>
+          <div class="player-name" id="opp1Name">
+            <%= opponents[1]?.nickname || "—" %>
+          </div>
+          <div class="player-meta" id="opp1Count">
+            <%= opponents[1] ? opponents[1].handCount + " cards" : "" %>
+          </div>
         </div>
 
         <!-- CENTER PILES -->
@@ -61,8 +69,12 @@
 
         <!-- RIGHT PLAYER -->
         <div class="player-slot player-right">
-          <div class="player-name"><%= opponents[2]?.nickname || "—" %></div>
-          <div class="player-meta"><%= opponents[2] ? opponents[2].handCount + " cards" : "" %></div>
+          <div class="player-name" id="opp2Name">
+            <%= opponents[2]?.nickname || "—" %>
+          </div>
+          <div class="player-meta" id="opp2Count">
+            <%= opponents[2] ? opponents[2].handCount + " cards" : "" %>
+          </div>
         </div>
 
       </div>
