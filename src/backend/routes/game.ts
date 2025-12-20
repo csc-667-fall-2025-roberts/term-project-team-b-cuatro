@@ -522,6 +522,9 @@ gamePageRouter.get("/:roomCode", (req, res) => {
         currentPlayer: game.players[game.currentTurnIndex],
         chat: game.chat,
         myNickname: req.session.game.nickname,
+
+        //for glow usage:
+        username: req.session.game.nickname,
     });
 
 });

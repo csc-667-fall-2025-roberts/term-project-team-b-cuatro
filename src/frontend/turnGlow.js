@@ -7,10 +7,15 @@
     wild: "#9b59b6",
   };
 
-  function getMyUsername() {
-    const main = document.querySelector("main.game-layout");
-    return main?.dataset?.myUsername || "";
-  }
+//   function getMyUsername() {
+//     const main = document.querySelector("main.game-layout");
+//     return main?.dataset?.myUsername || "";
+//   }
+    function getMyUsername() {
+         const root = document.querySelector(".game-layout");
+         return root?.dataset?.myUsername || "";
+    }
+
 
   function getActiveCardColorFromDOM() {
     // discard pile top card is rendered into #discard-pile as a .uno-card
