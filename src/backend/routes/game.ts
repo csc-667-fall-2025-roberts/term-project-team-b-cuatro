@@ -35,6 +35,9 @@ export type GameRoom = {
     //players: {username: string; nickname:string}[];
     players: Player[];
     chat: ChatMessage[];
+    // ---- end game ----
+    winnerUsername?: string;
+    winnerNickname?: string;
 
     // ---- gameplay state ----
     status: GameStatus;
@@ -500,12 +503,16 @@ gamesApiRouter.post("/:roomCode/play", (req, res) => {
     // win check
     if (player.hand.length === 0) {
         game.status = "finished";
+        game.winnerUsername = player.username;
+        game.winnerNickname = player.nickname;
+
+        // stop here so no more turns/bots happen
+        return res.json({ ok: true });
     }
 
-    startTurn(game);
-
-    // Bot AI
-    scheduleBotTurns(game);
+        startTurn(game);
+        // Bot AI
+        scheduleBotTurns(game);
 
     return res.json({ ok: true });
 });
@@ -577,6 +584,15 @@ gamePageRouter.get("/:roomCode", (req, res) => {
 
     const isHost = game.host === req.session.user.username;
 
+    // If finished, show end screen
+    if (game.status === "finished") {
+        return res.render("endGame", {
+            roomCode: game.roomCode,
+            winnerNickname: game.winnerNickname || "",
+            winnerUsername: game.winnerUsername || "",
+        });
+    }
+
     // If not running, show waiting room (host can start)
     if (game.status !== "running") {
         return res.render("game-waiting", {
@@ -606,7 +622,7 @@ gamePageRouter.get("/:roomCode", (req, res) => {
         myNickname: req.session.game.nickname,
 
         //for glow usage:
-        username: req.session.game.nickname,
+        username: req.session.user.username,
     });
 
 });
