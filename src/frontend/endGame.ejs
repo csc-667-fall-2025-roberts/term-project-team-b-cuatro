@@ -9,31 +9,27 @@
 </head>
 <body>
 
-  <div class="end-wrap">
-    <div class="end-card">
-      <div class="end-header">There Can Only Be UNO Winner</div>
+  <link rel="stylesheet" href="/styles/endGame.css" />
 
-      <div class="end-body">
-        <h1>CONGRATS</h1>
+<div class="endgame-page">
+  <div class="endgame-card">
+    <div class="endgame-header">There Can Only Be UNO Winner</div>
 
-        <div class="winner-box">
-          <div class="winner-name">
-            <%= (winnerNickname && winnerNickname.trim().length > 0)
-              ? winnerNickname
-              : winnerUsername %>
-          </div>
-        </div>
+    <div class="endgame-content">
+      <h1 class="endgame-title">CONGRATS</h1>
 
-        <div class="end-actions">
-          <form action="/auth/logout" method="POST">
-            <button class="btn btn-logout" type="submit">LOG OUT</button>
-          </form>
+      <div class="winner-panel">
+        <div class="winner-name"><%= winnerNickname || winnerUsername %></div>
+      </div>
 
-          <a class="btn btn-lobby" href="/lobby">GO TO LOBBY</a>
-        </div>
+      <div class="endgame-actions">
+        <a class="endgame-btn btn-logout" href="/logout">LOG OUT</a>
+        <a class="endgame-btn btn-lobby" href="/lobby">GO TO LOBBY</a>
       </div>
     </div>
   </div>
+</div>
+
 
 </body>
 </html>
