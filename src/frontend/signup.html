@@ -21,10 +21,9 @@
         <section class="form-card">
             <h2>Sign Up</h2>
 
-            <!-- Optional error message -->
-            <!-- <div class="error-message">Email already exists</div> -->
+            <div id="error" style="display:none; color:var(--primary); margin: 10px 0;"></div>
 
-            <form action="/auth/signup" method="POST">
+            <form id="signupForm" action="/auth/signup" method="POST">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" placeholder="Choose a username" required />
 
@@ -42,6 +41,38 @@
                 <a href="login.html">Log in</a>
             </p>
         </section>
+
+        <script>
+            const form = document.getElementById("signupForm");
+            const errorDiv = document.getElementById("error");
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                errorDiv.style.display = "none";
+                errorDiv.textContent = "";
+
+                const formData = new FormData(form);
+
+                const res = await fetch(form.action, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams(formData),
+                });
+
+                const data = await res.json().catch(() => null);
+
+                if (res.ok) {
+                    window.location.href = data?.redirectTo || "/login.html";
+                    return;
+                }
+
+                const msg = data?.error || "This account already exists!";
+                errorDiv.textContent = msg;
+                errorDiv.style.display = "block";
+            });
+
+        </script>
     </main>
 </body>
 </html>

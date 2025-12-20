@@ -51,16 +51,12 @@ router.post("/auth/signup", async (req, res, next) => {
         let result =  await pool.query(query, [username, email, password_hash])
         console.log("New user:", result.rows[0]);
 
-        res.sendFile(path.join(__dirname, "../../frontend/login.html"));
-        //   return res
-        // .status(201)
-        // .send(`Signed up as ${result.rows[0].username} with id ${result.rows[0].id}`);
-
+        return res.status(201).json({ ok: true, redirectTo: "/login.html" });
     } catch (err: any) {
 
         // specific error code for accounts that exist already
         if(err.code === "23505"){
-          return res.status(400).send("Email already in use!");
+          return res.status(409).json({ error: "Email already in use!" });
         }
 
         // generic error
@@ -77,7 +73,7 @@ router.post("/auth/login", async (req, res, next) => {
 
         // ensure data is present
         if(!username || !password){
-            return res.status(400).send("Missing required fields");
+            return res.status(400).json({ error: "Missing required fields" });
         }
 
         // get and compare passwords for validation
@@ -100,14 +96,12 @@ router.post("/auth/login", async (req, res, next) => {
             username: user.username,
             email:user.email
           };
-          return res.redirect("/lobby");
-          // return res.render("lobby", { username: user.username });
+          return res.status(200).json({ ok: true, redirectTo: "/lobby" });
         }
         
         console.log(bcrypt.hash(password, 10))
         console.log(user.password_hash)
-        return res.status(400).send("password invalid");
-       
+        return res.status(400).json({ error: "Invalid Credentials" });
 
     } catch (err: any) {
         // generic error
