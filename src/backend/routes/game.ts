@@ -50,6 +50,7 @@ export type GameRoom = {
     awaitingWildColor: boolean;
 };
 
+
 // Game Storage
 export const games = new Map<string, GameRoom>();
 
@@ -172,69 +173,135 @@ function startTurn(game: GameRoom) {
 // Mounted at /api/games
 const gamesApiRouter = express.Router();
 
-gamesApiRouter.post("/create", (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).send("Not logged in");
-    }
+const MAX_BOTS = 3;
+const MAX_TOTAL_PLAYERS = 4;
 
-    const { nickname, bots } = req.body;
+function isValidStartingCard(card: UnoCard) {
+  return (
+    card.value !== "wild" &&
+    card.value !== "wild_draw4" &&
+    card.value !== "skip" &&
+    card.value !== "reverse" &&
+    card.value !== "draw2"
+  );
+}
 
-    if (!nickname) {
-        return res.status(400).send("Missing nickname");
-    }
+function startGame(game: GameRoom) {
 
-    const botCount = Number(bots);
-    if (isNaN(botCount) || botCount < 0 || botCount > 9) {
-        return res.status(400).send("Invalid bot count");
-    }
+    // MIN PLAYERS CHECK!!! if the host created an empty room, add 1 bot!
+    if (game.players.length === 1) {
+    if (game.bots + 1 > MAX_BOTS) return false;
+    if (game.players.length + 1 > MAX_TOTAL_PLAYERS) return false;
 
-    let roomCode = generateRoomCode();
-    while (games.has(roomCode)) {
-        roomCode = generateRoomCode();
-    }
-
-    const game: GameRoom = {
-        roomCode,
-        host: req.session.user.username,
-        bots: botCount,
-        players: [
-        {
-            username: req.session.user.username,
-            nickname,
-            hand:[]
-        }
-        ],
-        chat:[],
-
-        status: "waiting",
-        deck: [],
-        discard: [],
-        currentTurnIndex: 0,
-        direction: 1,
-        pendingDraw: 0,
-        pendingSkip: false,
-        awaitingWildColor: false,
-    };
-
-    // Add bots as players right away (no hands yet)
-for (let i = 0; i < botCount; i++) {
     game.players.push({
-        username: `BOT_${i + 1}`,
-        nickname: `Bot ${i + 1}`,
-        hand: [] // will be dealt on start
+      username: `BOT_${game.bots + 1}`,
+      nickname: `Bot ${game.bots + 1}`,
+      hand: []
     });
-    }   
+    game.bots += 1;
+  }
 
-    games.set(roomCode, game);
+  // init deck + deal
+  game.deck = shuffle(createDeck());
+  game.discard = [];
+  game.direction = 1;
+  game.pendingDraw = 0;
+  game.pendingSkip = false;
+  game.awaitingWildColor = false;
 
-    // store game info in session
-    req.session.game = {
-        roomCode,
-        role: "host",
-        nickname
-    };
+  // deal 7 each
+  for (const p of game.players) p.hand = [];
+  for (const p of game.players) drawCards(game, p, 7);
 
-    return res.redirect(`/game/${roomCode}`);
+  // flip first non-wild card to discard
+  let first = game.deck.pop();
+  while (first && !isValidStartingCard(first)) {
+    game.deck.unshift(first);
+    first = game.deck.pop();
+  }
+  if (!first) return false;
+
+  game.discard.push(first);
+
+  // first player's turn
+  game.currentTurnIndex = 0;
+  game.chat = [];
+  game.status = "running";
+
+  scheduleBotTurns(game);
+  return true;
+}
+ 
+gamesApiRouter.post("/create", (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).send("Not logged in");
+  }
+
+  const { nickname, bots } = req.body;
+
+  if (!nickname) {
+    return res.status(400).send("Missing nickname");
+  }
+
+  const botCount = Number(bots);
+  if (isNaN(botCount) || botCount < 0 || botCount > MAX_BOTS) {
+    return res.status(400).send("Invalid bot count");
+  }
+
+  // max number players
+  if (1 + botCount > MAX_TOTAL_PLAYERS) {
+    return res.status(400).send("Too many players for room limit");
+  }
+
+  let roomCode = generateRoomCode();
+  while (games.has(roomCode)) {
+    roomCode = generateRoomCode();
+  }
+
+  const game: GameRoom = {
+    roomCode,
+    host: req.session.user.username,
+    bots: botCount,
+    players: [
+      {
+        username: req.session.user.username,
+        nickname,
+        hand: []
+      }
+    ],
+    chat: [],
+    status: "waiting",
+    deck: [],
+    discard: [],
+    currentTurnIndex: 0,
+    direction: 1,
+    pendingDraw: 0,
+    pendingSkip: false,
+    awaitingWildColor: false,
+  };
+
+  // Add bots as players right away
+  for (let i = 0; i < botCount; i++) {
+    game.players.push({
+      username: `BOT_${i + 1}`,
+      nickname: `Bot ${i + 1}`,
+      hand: []
+    });
+  }
+
+  games.set(roomCode, game);
+
+  req.session.game = { roomCode, role: "host", nickname };
+
+  // if 3 bots, auto start immediately (since no humans can join)
+  if (botCount === MAX_BOTS) {
+    const ok = startGame(game);
+    if (!ok) {
+      return res.status(500).send("Deck init failed");
+    }
+  }
+
+  return res.redirect(`/game/${roomCode}`);
 });
 
 
@@ -284,34 +351,9 @@ gamesApiRouter.post("/:roomCode/start", (req, res) => {
     if (game.host !== req.session.user.username) return res.status(403).send("Only host can start");
     if (game.status !== "waiting") return res.status(400).send("Game already started");
 
-    // init deck + deal
-    game.deck = shuffle(createDeck());
-    game.discard = [];
-    game.direction = 1;
-    game.pendingDraw = 0;
-    game.pendingSkip = false;
-    game.awaitingWildColor = false;
 
-    // deal 7 each
-    for (const p of game.players) p.hand = [];
-    for (const p of game.players) drawCards(game, p, 7);
-
-    // flip first non-wild card to discard to start (simple rule)
-    let first = game.deck.pop();
-    while (first && (first.value === "wild" || first.value === "wild_draw4")) {
-        // put it back somewhere
-        game.deck.unshift(first);
-        first = game.deck.pop();
-    }
-    if (!first) return res.status(500).send("Deck init failed");
-    game.discard.push(first);
-
-    // first player's turn
-    game.currentTurnIndex = 0;
-    game.chat = [];
-    game.status = "running";
-
-    scheduleBotTurns(game);
+    const ok = startGame(game);
+    if (!ok) return res.status(500).send("Deck init failed");
 
     return res.json({ ok: true });
 });
@@ -418,7 +460,6 @@ gamesApiRouter.post("/:roomCode/play", (req, res) => {
     // apply effects
     if (card.value === "reverse") {
         game.direction = (game.direction === 1 ? -1 : 1);
-        nextTurn(game, 1);
     } else if (card.value === "skip") {
         // skip next player
         nextTurn(game, 2);
