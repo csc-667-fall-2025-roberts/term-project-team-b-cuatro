@@ -580,7 +580,8 @@ button:not(form button) {
 /* CHAT STYLES */
 
 .chat-box {
-  height: 360px;
+  flex: 1;  
+  min-height: 520px;
   overflow-y: auto;
   border: 1px solid #e6e6e6;
   border-radius: 10px;
