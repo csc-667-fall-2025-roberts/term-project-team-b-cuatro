@@ -17,7 +17,9 @@
         <nav class="user-nav">
             <span class="user-info">Logged in as: <strong><%= username %></strong></span>
             <br>
-            <a class="logout-btn" href="index.html">Logout</a>
+            <form action="/auth/logout" method="POST" class="logout-form">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
         </nav>
     </header>
 
