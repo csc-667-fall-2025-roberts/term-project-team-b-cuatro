@@ -576,3 +576,51 @@ button:not(form button) {
             "chat";
     }
 }
+
+/* CHAT STYLES */
+
+.chat-box {
+  height: 360px;
+  overflow-y: auto;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  padding: 10px;
+  background: #fafafa;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.chat-msg {
+  margin: 6px 0;
+}
+
+.chat-name {
+  font-weight: 700;
+}
+
+.chat-time {
+  color: #777;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.chat-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
+.chat-input {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  outline: none;
+}
+
+.chat-send {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+

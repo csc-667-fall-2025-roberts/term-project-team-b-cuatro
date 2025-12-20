@@ -1,175 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UNO Game</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UNO Game</title>
 
-    <link rel="stylesheet" href="/styles/main.css" />
-    <link rel="stylesheet" href="/styles/turnGlow.css" />
-
+  <link rel="stylesheet" href="/styles/main.css" />
+  <link rel="stylesheet" href="/styles/turnGlow.css" />
 </head>
+
 <body>
-    <header class="site-header">
-        <h1>UNO Game</h1>
-        <nav>
-        <a href="/lobby">Back to Lobby</a>
-        </nav>
-    </header>
+  <header class="site-header">
+    <h1>UNO Game</h1>
+    <nav>
+      <a href="/lobby">Back to Lobby</a>
+    </nav>
+  </header>
 
-    <main class="game-layout" data-my-username="<%= username %>">
+  <main class="game-layout" data-my-username="<%= username %>">
 
+    <!-- GAME INFO BAR -->
+    <section class="game-info card">
+      <h2>Room: <%= roomCode %></h2>
+      <p>Players: <%= players.length %></p>
+      <p>
+        Turn:
+        <strong id="currentTurn">
+          <%= currentPlayer ? currentPlayer.nickname : "—" %>
+        </strong>
+      </p>
+    </section>
 
-        <!-- GAME INFO BAR -->
-        <section class="game-info card">
-        <h2>Room: <%= roomCode %></h2>
-        <p>Players: <%= players.length %></p>
-        <p>
-            Turn:
-            <strong id="currentTurn">
-                <%= currentPlayer ? currentPlayer.nickname : "—" %>
-            </strong>
-        </p>
-        </section>
+    <!-- GAME BOARD -->
+    <section class="game-board card">
+      <div class="game-table-grid">
 
-        <!-- GAME BOARD -->
-        <section class="game-board card">
-        <div class="game-table-grid">
-
-            <!-- TOP PLAYER -->
-            <div class="player-slot player-top">
-            <div class="player-name">
-                <%= opponents[0]?.nickname || "—" %>
-            </div>
-            <div class="player-meta">
-                <%= opponents[0] ? opponents[0].handCount + " cards" : "" %>
-            </div>
-            </div>
-
-            <!-- LEFT PLAYER -->
-            <div class="player-slot player-left">
-            <div class="player-name">
-                <%= opponents[1]?.nickname || "—" %>
-            </div>
-            <div class="player-meta">
-                <%= opponents[1] ? opponents[1].handCount + " cards" : "" %>
-            </div>
-            </div>
-
-            <!-- CENTER PILES -->
-            <div class="table-center">
-            <div class="pile">
-                <div class="pile-label">Discard</div>
-                <div class="pile-cards" id="discard-pile"></div>
-            </div>
-            <div class="pile">
-                <div class="pile-label">Draw</div>
-                <div class="pile-cards" id="draw-pile"></div>
-            </div>
-            </div>
-
-            <!-- RIGHT PLAYER -->
-            <div class="player-slot player-right">
-            <div class="player-name">
-                <%= opponents[2]?.nickname || "—" %>
-            </div>
-            <div class="player-meta">
-                <%= opponents[2] ? opponents[2].handCount + " cards" : "" %>
-            </div>
-            </div>
-
+        <!-- TOP PLAYER -->
+        <div class="player-slot player-top">
+          <div class="player-name"><%= opponents[0]?.nickname || "—" %></div>
+          <div class="player-meta"><%= opponents[0] ? opponents[0].handCount + " cards" : "" %></div>
         </div>
-        </section>
 
-        <!-- PLAYER HAND -->
-        <section class="player-hand card">
-        <h2>Your Cards</h2>
-        <div class="hand-cards" id="player-hand"></div>
-        </section>
+        <!-- LEFT PLAYER -->
+        <div class="player-slot player-left">
+          <div class="player-name"><%= opponents[1]?.nickname || "—" %></div>
+          <div class="player-meta"><%= opponents[1] ? opponents[1].handCount + " cards" : "" %></div>
+        </div>
 
-        <!-- GAME CHAT (same logic as lobby) -->
-        <section class="game-chat card">
-        <h2>Game Chat</h2>
+        <!-- CENTER PILES -->
+        <div class="table-center">
+          <div class="pile">
+            <div class="pile-label">Discard</div>
+            <div class="pile-cards" id="discard-pile"></div>
+          </div>
+          <div class="pile">
+            <div class="pile-label">Draw</div>
+            <div class="pile-cards" id="draw-pile"></div>
+          </div>
+        </div>
 
-        <div id="chatBox" class="chat-box"></div>
+        <!-- RIGHT PLAYER -->
+        <div class="player-slot player-right">
+          <div class="player-name"><%= opponents[2]?.nickname || "—" %></div>
+          <div class="player-meta"><%= opponents[2] ? opponents[2].handCount + " cards" : "" %></div>
+        </div>
 
-        <form id="chatForm" class="chat-input">
-            <input
-            id="chatInput"
-            type="text"
-            maxlength="200"
-            placeholder="Message as <%= myNickname %>..."
-            />
-            <button type="submit">Send</button>
-        </form>
-        </section>
+      </div>
+    </section>
 
-    </main>
+    <!-- PLAYER HAND -->
+    <section class="player-hand card">
+      <h2>Your Cards</h2>
+      <div class="hand-cards" id="player-hand"></div>
+    </section>
 
-    <!-- GAME LOGIC -->
-    <script src="/game.js"></script>
-    <script src="/turnGlow.js"></script>
+    <!-- GAME CHAT -->
+    <section class="game-chat card">
+      <h2>Game Chat</h2>
 
+      <div id="chatBox" class="chat-box"></div>
 
-    <!-- CHAT SCRIPT -->
-    <script>
-        const roomCode = "<%= roomCode %>";
-        const chatBox = document.getElementById("chatBox");
-        const chatForm = document.getElementById("chatForm");
-        const chatInput = document.getElementById("chatInput");
+      <!-- IMPORTANT: button must be submit -->
+      <form id="chatForm" class="chat-form" autocomplete="off">
+        <input
+          id="chatInput"
+          class="chat-input"
+          type="text"
+          maxlength="200"
+          placeholder="Message as <%= myNickname %>..."
+        />
+        <button id="chatSendBtn" class="chat-send" type="submit">Send</button>
+      </form>
+    </section>
 
-        function formatTime(ts) {
-        const d = new Date(ts);
-        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        }
+  </main>
 
-        async function loadChat() {
-        try {
-            const res = await fetch(`/api/games/${roomCode}/chat`);
-            const messages = await res.json();
+  <!-- GAME LOGIC -->
+  <script src="/game.js"></script>
+  <script src="/turnGlow.js"></script>
 
-            chatBox.innerHTML = messages.map(m => {
-            const safeText = String(m.text)
-                .replaceAll("&", "&amp;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;");
-            const safeName = String(m.nickname)
-                .replaceAll("&", "&amp;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;");
+  <!-- CHAT SCRIPT -->
+  <script>
+    const chatRoomCode = "<%= roomCode %>";
+    const chatBox = document.getElementById("chatBox");
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const chatSendBtn = document.getElementById("chatSendBtn");
 
-            return `
-                <div class="chat-msg">
-                <span class="chat-name">${safeName}:</span>
-                <span>${safeText}</span>
-                <span class="chat-time">${formatTime(m.ts)}</span>
-                </div>
-            `;
-            }).join("");
+    let sending = false;
 
-            chatBox.scrollTop = chatBox.scrollHeight;
-        } catch {}
-        }
+    function escapeHtml(s) {
+      return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
 
-        chatForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const text = chatInput.value.trim();
-        if (!text) return;
+    function formatTime(ts) {
+      const d = new Date(ts);
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
 
+    async function loadChat() {
+      try {
+        const res = await fetch(`/api/games/${roomCode}/chat`);
+        if (!res.ok) return;
+
+        const messages = await res.json();
+
+        chatBox.innerHTML = messages.map(m => {
+          const safeText = escapeHtml(m.text);
+          const safeName = escapeHtml(m.nickname);
+
+          return `
+            <div class="chat-msg">
+              <span class="chat-name">${safeName}:</span>
+              <span>${safeText}</span>
+              <span class="chat-time">${formatTime(m.ts)}</span>
+            </div>
+          `;
+        }).join("");
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (e) {}
+    }
+
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault(); // stops refresh
+      if (sending) return;
+
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      sending = true;
+      chatSendBtn.disabled = true;
+
+      try {
         chatInput.value = "";
 
-        await fetch(`/api/games/${roomCode}/chat`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text })
+        const res = await fetch(`/api/games/${roomCode}/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text })
         });
 
-        loadChat();
-        });
+        // optional: if debugging, uncomment:
+        // if (!res.ok) console.log(await res.text());
 
-        loadChat();
-        setInterval(loadChat, 2000);
-    </script>
+        await loadChat();
+      } finally {
+        sending = false;
+        chatSendBtn.disabled = false;
+        chatInput.focus();
+      }
+    });
+
+    loadChat();
+    setInterval(loadChat, 2000);
+  </script>
 
 </body>
 </html>
