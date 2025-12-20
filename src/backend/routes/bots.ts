@@ -1,5 +1,28 @@
 import { GameRoom, UnoCard, UnoColor, Player } from "./game";
 
+function randomBotTaunt(type: "draw2" | "draw4") {
+  const draw2Lines = [
+    "hahaha 😈 +2 for you!",
+    "Oops… draw two!",
+    "UNO says no 😎",
+    "Take these cards!",
+    "Bruh play a card already"
+  ];
+
+  const draw4Lines = [
+    "HAHAHA +4 😈😈",
+    "UNO gods demand sacrifice!",
+    "This is personal. +4.",
+    "Suffer 😎 +4",
+    "gg2fuckingez"
+  ];
+
+  const list = type === "draw2" ? draw2Lines : draw4Lines;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+
+
 function canPlay(card: UnoCard, top: UnoCard): boolean {
     if (card.value === "wild" || card.value === "wild_draw4") return true;
     return card.color === top.color || card.value === top.value;
@@ -105,10 +128,22 @@ export function runBotTurn(game: GameRoom) {
             nextTurn(game, 2);
         } else if (playable.value === "draw2") {
             game.pendingDraw += 2;
+
+            game.chat.push({
+                nickname: player.nickname,
+                text: randomBotTaunt("draw2"),
+                ts: Date.now()
+            });
+
             nextTurn(game, 1);
             applyPendingDrawAndSkip(game);
         } else if (playable.value === "wild_draw4") {
             game.pendingDraw += 4;
+            game.chat.push({
+                nickname: player.nickname,
+                text: randomBotTaunt("draw4"),
+                ts: Date.now()
+            });
             nextTurn(game, 1);
             applyPendingDrawAndSkip(game);
         } else {
@@ -152,3 +187,4 @@ export function scheduleBotTurns(game: GameRoom) {
 
     void loop();
 }
+
