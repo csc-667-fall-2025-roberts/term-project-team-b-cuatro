@@ -44,13 +44,10 @@ function renderCardDiv(card, clickable, onClick) {
   return div;
 }
 
-// DOM nodes from your existing game.ejs markup (same IDs as before)
 const playerHandEl = document.getElementById("player-hand");
 const discardPileEl = document.getElementById("discard-pile");
 const drawPileEl = document.getElementById("draw-pile");
 
-// Optional: if you add these IDs later, we’ll fill them.
-// If they don’t exist, we just skip.
 const infoGameName = document.getElementById("gameName");
 const infoPlayerCount = document.getElementById("playerCount");
 const infoTurn = document.getElementById("currentTurn");
@@ -76,11 +73,15 @@ async function fetchState() {
 }
 
 async function playCard(card) {
+
+   if (!lastState || lastState.currentTurnUsername !== getMyUsername()) {
+    return;
+   }
   const body = { cardId: card.id };
 
   // Wild needs a chosen color
   if (card.value === "wild" || card.value === "wild_draw4") {
-    const choice = prompt("Choose color: red, yellow, green, blue");
+    const choice =await pickWildColor();
     body.wildColor = choice;
   }
 
@@ -88,6 +89,7 @@ async function playCard(card) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
+    credentials: "include",
   });
 
   if (!res.ok) {
@@ -100,6 +102,25 @@ async function drawCard() {
   if (!res.ok) {
     alert(await res.text());
   }
+}
+
+function pickWildColor() {
+  return new Promise((resolve) => {
+    const picker = document.getElementById("wildPicker");
+    picker.classList.remove("hidden");
+
+    const onClick = (e) => {
+      const btn = e.target.closest("button[data-color]");
+      if (!btn) return;
+
+      const color = btn.dataset.color;
+      picker.classList.add("hidden");
+      picker.removeEventListener("click", onClick);
+      resolve(color);
+    };
+
+    picker.addEventListener("click", onClick);
+  });
 }
 
 function render(state) {

@@ -625,3 +625,54 @@ button:not(form button) {
   cursor: pointer;
 }
 
+/* select color when wild card */
+.wild-picker.hidden { display: none; }
+
+.wild-picker {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+}
+
+.wild-picker-card {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  min-width: 260px;
+}
+
+.wild-picker-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.wild-btn {
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.yellow { background-color: #ffd700; }
+
+.green{ background-color: #3cb371; }
+
+.blue{ background-color: #1e90ff; }
+
+.red{ background-color: #d93f3f; }
+
+.wild-btn {
+    border: rgba(0,0,0,0) 3px solid; /*make sure width stays the same!!*/
+    opacity: 50%;
+}
+
+.wild-btn:hover {
+    opacity: 100%;
+}

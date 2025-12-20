@@ -19,6 +19,19 @@
 
   <main class="game-layout" data-my-username="<%= username %>">
 
+    <div id="wildPicker" class="wild-picker hidden">
+    <div class="wild-picker-card">
+      <h3>Choose a color</h3>
+      <div class="wild-picker-buttons">
+        <button data-color="red" class="wild-btn red">Red</button>
+        <button data-color="yellow" class="wild-btn yellow">Yellow</button>
+        <button data-color="green" class="wild-btn green">Green</button>
+        <button data-color="blue" class="wild-btn blue">Blue</button>
+      </div>
+    </div>
+  </div>
+
+
     <!-- GAME INFO BAR -->
     <section class="game-info card">
       <h2>Room: <%= roomCode %></h2>
