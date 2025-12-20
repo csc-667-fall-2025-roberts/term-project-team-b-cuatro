@@ -153,6 +153,8 @@ export function runBotTurn(game: GameRoom) {
         // win condition
         if (player.hand.length === 0) {
         game.status = "finished";
+        game.winnerNickname = player.nickname;
+        game.winnerUsername = player.username;
         return;
         }
     } else {

@@ -64,7 +64,13 @@ function generateRoomCode(length = 6){
 }
 
 
-// Uno Helpers
+// Uno Helpers-----------------------------------------------------------------
+function finishGame (game: GameRoom, winner: Player){
+    game.status = "finished";
+    game.winnerUsername = winner.username;
+    game.winnerNickname = winner.nickname;
+}
+
 function uid() {
     return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
@@ -485,9 +491,7 @@ gamesApiRouter.post("/:roomCode/play", (req, res) => {
 
     // win check
     if (player.hand.length === 0) {
-        game.status = "finished";
-        game.winnerUsername = player.username;
-        game.winnerNickname = player.nickname;
+        finishGame(game,player);
 
         // stop here so no more turns/bots happen
         return res.json({ ok: true });
