@@ -8,8 +8,8 @@ if (!roomCode || parts[0] !== "game") {
 // --- same symbol helper idea you had before ---
 function cardSymbol(card) {
   const v = String(card.value);
-  if (v === "skip") return "⏭";
-  if (v === "reverse") return "🔄";
+  if (v === "skip") return "🛇";
+  if (v === "reverse") return "⟲";
   if (v === "draw2") return "+2";
   if (v === "wild") return "W";
   if (v === "wild_draw4") return "+4";

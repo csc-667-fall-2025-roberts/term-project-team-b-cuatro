@@ -24,8 +24,6 @@ router.get("/lobby", (req, res)=> {
 });
 
 
-
-
 // ---------- API ENDPOINTS ----------
 
 // handle signups for new users
@@ -148,61 +146,5 @@ router.post("/messages/send", (req, res) => {
   // game.html lives at /game.html, not /game/:code
   return res.redirect(`/game.html?roomCode=${roomCode}`);
 });
-
-// router.post("/api/games/:roomCode", (req, res) => {
-//   if (!req.session.user || !req.session.game) {
-//     return res.status(401).send("Not logged in");
-//   }
-
-//   const roomCode = req.params.roomCode.trim().toUpperCase();
-
-//   // only allow posting to the room the user is actually in
-//   if (req.session.game.roomCode !== roomCode) {
-//     return res.status(403).send("Not in this room");
-//   }
-
-//   const text = (req.body.text || "").toString().trim();
-//   if (!text) return res.status(400).send("Empty message");
-//   if (text.length > 200) return res.status(400).send("Message too long");
-
-//   const nickname = req.session.game.nickname;
-
-//   const arr = chats.get(roomCode) ?? [];
-//   arr.push({ nickname, text, ts: Date.now() });
-//   chats.set(roomCode, arr);
-
-//   return res.status(201).json({ ok: true });
-// });
-
-
-// router.post("/api/chat/:roomCode", (req, res) => {
-//   if (!req.session.user || !req.session.game) {
-//     return res.redirect("/lobby");
-//   }
-
-//   const game = games.get(req.params.roomCode);
-//   if (!game) {
-//     return res.redirect("/lobby");
-//   }
-
-//   const message = req.body.message;
-//   if (!message) {
-//     return res.redirect(`/game/${req.params.roomCode}`);
-//   }
-
-//   game.chat.push({
-//     sender: req.session.game.nickname,
-//     text: message,
-//     time: new Date().toLocaleTimeString([], {
-//       hour: "2-digit",
-//       minute: "2-digit"
-//     })
-//   });
-
-//   return res.redirect(`/game/${req.params.roomCode}`);
-// });
-
-
-
 
 export default router;
