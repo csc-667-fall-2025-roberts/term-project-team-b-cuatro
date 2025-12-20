@@ -1,0 +1,24 @@
+/* Base glow (off by default) */
+.player-slot {
+  transition: box-shadow 0.3s ease, border 0.3s ease;
+}
+
+/* Active turn glow */
+.player-slot.active-turn {
+  box-shadow: 0 0 18px 6px var(--turn-color);
+  border: 2px solid var(--turn-color);
+}
+/* Glow for the CURRENT TURN box (bots + you) */
+.active-turn {
+  box-shadow: 0 0 18px var(--turn-color), 0 0 40px color-mix(in srgb, var(--turn-color) 55%, transparent);
+  border: 2px solid color-mix(in srgb, var(--turn-color) 65%, transparent);
+}
+
+/* Optional: make your whole hand area look cleaner when highlighted */
+.player-hand.active-turn {
+  border-radius: 16px;
+}
+.active-turn {
+  box-shadow: 0 0 18px 6px var(--turn-color, rgba(241, 196, 15, 0.85));
+  transition: box-shadow 0.25s ease;
+}

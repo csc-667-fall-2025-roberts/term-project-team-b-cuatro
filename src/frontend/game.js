@@ -136,6 +136,13 @@ function render(state) {
     const div = renderCardDiv(card, true, () => playCard(card));
     playerHandEl.appendChild(div);
   });
+
+  //Turn Glow
+  if (window.updateTurnGlow){
+    window.updateTurnGlow(state);
+  }
+
+
 }
 
 async function loop() {
@@ -149,6 +156,7 @@ async function loop() {
     }
 
     render(state);
+    if (window.updateTurnGlow) window.updateTurnGlow(state);
   } catch (e) {
     console.error(e);
   }

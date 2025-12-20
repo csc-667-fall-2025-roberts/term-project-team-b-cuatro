@@ -6,6 +6,8 @@
     <title>UNO Game</title>
 
     <link rel="stylesheet" href="/styles/main.css" />
+    <link rel="stylesheet" href="/styles/turnGlow.css" />
+
 </head>
 <body>
     <header class="site-header">
@@ -15,7 +17,7 @@
         </nav>
     </header>
 
-    <main class="game-layout">
+    <main class="game-layout" data-my-username="<%= currentPlayer ? currentPlayer.username : '' %>">
 
         <!-- GAME INFO BAR -->
         <section class="game-info card">
@@ -105,6 +107,8 @@
 
     <!-- GAME LOGIC -->
     <script src="/game.js"></script>
+    <script src="/turnGlow.js"></script>
+
 
     <!-- CHAT SCRIPT -->
     <script>
