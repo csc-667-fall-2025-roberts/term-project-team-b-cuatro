@@ -401,13 +401,13 @@ gamesApiRouter.post("/:roomCode/play", (req, res) => {
     // wild handling: require color choice
     if (card.value === "wild" || card.value === "wild_draw4") {
         if (!wildColor || wildColor === "wild") {
-        // put card on discard but mark awaiting color
-        game.discard.push({ ...card, color: "wild" });
-        game.awaitingWildColor = true;
-        return res.status(400).send("Must choose wildColor (red/yellow/green/blue)");
+            // put card on discard but mark awaiting color
+            game.discard.push({ ...card, color: "wild" });
+            game.awaitingWildColor = true;
+            return res.status(400).send("Must choose wildColor (red/yellow/green/blue)");
         }
-        game.discard.push({ ...card, color: wildColor });
-        game.awaitingWildColor = false;
+            game.discard.push({ ...card, color: wildColor });
+            game.awaitingWildColor = false;
     } else {
         game.discard.push(card);
     }
@@ -428,6 +428,15 @@ gamesApiRouter.post("/:roomCode/play", (req, res) => {
         // normal card
         nextTurn(game, 1);
     }
+
+    if (game.pendingDraw > 0 && game.status === "running") {
+        const victim = game.players[game.currentTurnIndex];
+        if (victim) {
+        drawCards(game, victim, game.pendingDraw);
+        game.pendingDraw = 0;
+        nextTurn(game, 1); // skip victim
+        }
+  }
 
     // win check
     if (player.hand.length === 0) {
