@@ -195,7 +195,12 @@ async function loop() {
     lastState = state;
 
     if (state.status === "finished") {
-      alert("Game finished!");
+      // stop polling so we don't keep firing
+      if (typeof pollInterval !== "undefined") clearInterval(pollInterval);
+      if (typeof intervalId !== "undefined") clearInterval(intervalId);
+
+      // go to server route that renders endGame.ejs
+      window.location.href = `/game/${state.roomCode}`;
       return;
     }
 
@@ -207,4 +212,4 @@ async function loop() {
 }
 
 loop();
-setInterval(loop, 1000);
+const pollInterval = setInterval(loop, 1000);
